@@ -31,9 +31,20 @@ const formatTurnoData = (dateTimeStr: string) => {
 // Función para mapear estado a color MUI
 const getStatusColor = (estado: EstadoTurno): 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning' | 'info' => {
   switch (estado) {
-    case ESTADOS_TURNO.CONFIRMADO: return 'success';
-    case ESTADOS_TURNO.CANCELADO: return 'error';
-    default: return 'warning'; // 'pendiente'
+    case ESTADOS_TURNO.PENDIENTE: 
+      return 'warning'; // Naranja (como lo deseas)
+      
+    case ESTADOS_TURNO.REALIZADO: 
+      return 'success'; // Verde
+      
+    case ESTADOS_TURNO.CANCELADO: 
+      return 'error'; // Rojo
+      
+    case ESTADOS_TURNO.EN_PROCESO: 
+      return 'info'; // Celeste/Azul (MUI 'info' es un buen celeste)
+      
+    default: 
+      return 'default';
   }
 };
 

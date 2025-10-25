@@ -19,6 +19,7 @@ export interface Turno {
 
 export const ESTADOS_TURNO = {
     PENDIENTE: 'pendiente' as EstadoTurno,
-    CONFIRMADO: 'confirmado' as EstadoTurno,
+    REALIZADO: 'realizado' as EstadoTurno,
     CANCELADO: 'cancelado' as EstadoTurno,
+    EN_PROCESO: 'en proceso' as EstadoTurno,
 };
