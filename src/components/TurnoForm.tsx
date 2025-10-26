@@ -82,8 +82,15 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
         onSuccess();
         onClose(); 
     } catch (err: any) {
-      const message = err.response?.data?.mensaje || err.message || "Error al crear el turno. Verifique el horario y las IDs.";
-      setSubmitError(message);
+        // 🛑 LÓGICA DE CAPTURA DE ERRORES CORREGIDA 🛑
+        const serverResponseData = err.response?.data;
+
+        const message = serverResponseData?.mensaje // 1. Captura tu clave personalizada ('mensaje')
+                       || serverResponseData?.message // 2. Captura la clave estándar de NestJS ('message')
+                       || err.message // 3. Mensaje genérico de Axios
+                       || "Error desconocido al agendar el turno.";
+                       
+        setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }

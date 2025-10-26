@@ -56,4 +56,26 @@ export const getServicios = async (): Promise<Servicio[]> => {
   return response.data;
 };
 
-// ... Otras funciones para Cliente/Servicio si son necesarias.
+// =========================================================
+// 🟢 FUNCIONES NUEVAS PARA MANEJO DE ESTADO
+// =========================================================
+
+/**
+ * Cancela un turno.
+ * Endpoint: PATCH /turnos/:id/cancelar
+ */
+export const cancelarTurno = async (id: number): Promise<Turno> => {
+  // El backend maneja el cambio de estado a 'cancelado'.
+  const response = await api.patch<Turno>(`/turnos/${id}/cancelar`, {});
+  return response.data;
+};
+
+/**
+ * Reprograma un turno a una nueva fecha y hora.
+ * Endpoint: PATCH /turnos/:id/reprogramar
+ */
+export const reprogramarTurno = async (id: number, nuevaFechaHora: string): Promise<Turno> => {
+  // Enviamos la nueva fecha_hora en el cuerpo (Body) del request.
+  const response = await api.patch<Turno>(`/turnos/${id}/reprogramar`, { fecha_hora: nuevaFechaHora });
+  return response.data;
+};
