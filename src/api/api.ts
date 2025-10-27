@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { Barbero, CreateBarberoDto, UpdateBarberoDto } from '../types/Barbero';
 import type { Turno } from '../types/Turno';
 import type { Cliente, CreateClienteDto, UpdateClienteDto } from '../types/Cliente';
-import type { Servicio } from '../types/Servicio';
+import type { CreateServicioDto, Servicio, UpdateServicioDto } from '../types/Servicio';
 
 const API_URL = 'http://localhost:3000';
 const api = axios.create({
@@ -90,14 +90,6 @@ export const deleteTurno = async (id: number): Promise<void> => {
 };
 
 
-/**
- * Obtiene la lista completa de servicios.
- */
-export const getServicios = async (): Promise<Servicio[]> => {
-  const response = await api.get<Servicio[]>('/servicios');
-  return response.data;
-};
-
 // =========================================================
 // 🟢 FUNCIONES NUEVAS PARA MANEJO DE ESTADO
 // =========================================================
@@ -152,4 +144,37 @@ export const updateCliente = async (id: number, updatedFields: UpdateClienteDto)
  */
 export const deleteCliente = async (id: number): Promise<void> => {
   await api.delete(`/clientes/${id}`);
+};
+
+// --- Funciones de Servicios (CRUD) ---
+
+/**
+ * Obtiene la lista completa de servicios (GET /servicios)
+ */
+export const getServicios = async (): Promise<Servicio[]> => {
+  const response = await api.get<Servicio[]>('/servicios');
+  return response.data;
+};
+
+/**
+ * Crea un nuevo servicio (POST /servicios)
+ */
+export const createServicio = async (newServicio: CreateServicioDto): Promise<Servicio> => {
+  const response = await api.post<Servicio>('/servicios', newServicio);
+  return response.data;
+};
+
+/**
+ * Actualiza un servicio existente (PATCH /servicios/:id)
+ */
+export const updateServicio = async (id: number, updatedFields: UpdateServicioDto): Promise<Servicio> => {
+  const response = await api.patch<Servicio>(`/servicios/${id}`, updatedFields);
+  return response.data;
+};
+
+/**
+ * Elimina un servicio (DELETE /servicios/:id)
+ */
+export const deleteServicio = async (id: number): Promise<void> => {
+  await api.delete(`/servicios/${id}`);
 };
