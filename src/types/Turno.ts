@@ -23,3 +23,4 @@ export const ESTADOS_TURNO = {
     CANCELADO: 'cancelado' as EstadoTurno,
     EN_PROCESO: 'en proceso' as EstadoTurno,
 };
+

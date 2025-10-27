@@ -5,7 +5,9 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Dado que usamos MUI, es mejor dejar que MUI maneje el fondo global,
+     pero el color de fondo para el root suele ser el oscuro por defecto de Vite */
+  background-color: #242424; 
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,10 +26,15 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* 🛑 CORRECCIÓN: Se eliminan las propiedades de centrado para permitir el 100% de ancho */
+  /* display: flex; */
+  /* place-items: center; */
+  
   min-width: 320px;
   min-height: 100vh;
+  
+  /* Aseguramos que el fondo del body sea blanco o el color que hayas definido en MUI */
+  background-color: #ffffff; 
 }
 
 h1 {

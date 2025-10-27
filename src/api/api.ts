@@ -1,21 +1,30 @@
 import axios from 'axios';
-import type { Barbero } from '../types/Barbero';
+import type { Barbero, CreateBarberoDto, UpdateBarberoDto } from '../types/Barbero';
 import type { Turno } from '../types/Turno';
-import type { Cliente } from '../types/Cliente';
+import type { Cliente, CreateClienteDto, UpdateClienteDto } from '../types/Cliente';
 import type { Servicio } from '../types/Servicio';
 
-const API_URL = 'http://localhost:3000'; 
+const API_URL = 'http://localhost:3000';
 const api = axios.create({
-  baseURL: API_URL, 
+  baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
 // DTO para CREAR un turno
 export interface CreateTurnoDto {
-  fecha_hora: string; 
-  clienteId: number; 
-  barberoId: number; 
-  servicioId: number; 
+  fecha_hora: string;
+  clienteId: number;
+  barberoId: number;
+  servicioId: number;
+}
+
+// Define la interface para los parámetros de filtro
+export interface TurnoFilters {
+  barberoId?: number | string;
+  clienteId?: number | string;
+  servicioId?: number | string;
+  estado?: string;
+  fecha?: string; // Formato YYYY-MM-DD
 }
 
 // --- Funciones de la API ---
@@ -25,8 +34,45 @@ export const getBarberos = async (): Promise<Barbero[]> => {
   return response.data;
 };
 
-export const getTurnos = async (): Promise<Turno[]> => {
-  const response = await api.get<Turno[]>('/turnos');
+/**
+ * Crea un nuevo barbero (POST /barberos)
+ */
+export const createBarbero = async (newBarbero: CreateBarberoDto): Promise<Barbero> => {
+  const response = await api.post<Barbero>('/barberos', newBarbero);
+  return response.data;
+};
+
+/**
+ * Actualiza un barbero existente (PATCH /barberos/:id)
+ */
+export const updateBarbero = async (id: number, updatedFields: UpdateBarberoDto): Promise<Barbero> => {
+  const response = await api.patch<Barbero>(`/barberos/${id}`, updatedFields);
+  return response.data;
+};
+
+/**
+ * Elimina un barbero (DELETE /barberos/:id)
+ */
+export const deleteBarbero = async (id: number): Promise<void> => {
+  await api.delete(`/barberos/${id}`);
+};
+
+/**
+ * Obtiene la lista de turnos, aceptando filtros.
+ */
+export const getTurnos = async (filters: TurnoFilters = {}): Promise<Turno[]> => {
+  // 1. Construir los query parameters
+  const params = new URLSearchParams();
+
+  // Iterar sobre los filtros y agregarlos si tienen valor (no null, no 0, no vacío)
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value && value !== 0 && value !== '0' && value !== '') {
+      params.append(key, String(value));
+    }
+  });
+
+  // 2. Realizar la petición con los parámetros
+  const response = await api.get<Turno[]>('/turnos', { params });
   return response.data;
 };
 
@@ -43,10 +89,6 @@ export const deleteTurno = async (id: number): Promise<void> => {
   await api.delete(`/turnos/${id}`);
 };
 
-export const getClientes = async (): Promise<Cliente[]> => {
-  const response = await api.get<Cliente[]>('/clientes');
-  return response.data;
-};
 
 /**
  * Obtiene la lista completa de servicios.
@@ -78,4 +120,36 @@ export const reprogramarTurno = async (id: number, nuevaFechaHora: string): Prom
   // Enviamos la nueva fecha_hora en el cuerpo (Body) del request.
   const response = await api.patch<Turno>(`/turnos/${id}/reprogramar`, { fecha_hora: nuevaFechaHora });
   return response.data;
+};
+
+
+/**
+ * Obtiene la lista completa de clientes (GET /clientes)
+ */
+export const getClientes = async (): Promise<Cliente[]> => {
+  const response = await api.get<Cliente[]>('/clientes');
+  return response.data;
+};
+
+/**
+ * Crea un nuevo cliente (POST /clientes)
+ */
+export const createCliente = async (newCliente: CreateClienteDto): Promise<Cliente> => {
+  const response = await api.post<Cliente>('/clientes', newCliente);
+  return response.data;
+};
+
+/**
+ * Actualiza un cliente existente (PATCH /clientes/:id)
+ */
+export const updateCliente = async (id: number, updatedFields: UpdateClienteDto): Promise<Cliente> => {
+  const response = await api.patch<Cliente>(`/clientes/${id}`, updatedFields);
+  return response.data;
+};
+
+/**
+ * Elimina un cliente (DELETE /clientes/:id)
+ */
+export const deleteCliente = async (id: number): Promise<void> => {
+  await api.delete(`/clientes/${id}`);
 };

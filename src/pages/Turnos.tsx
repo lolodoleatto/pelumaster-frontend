@@ -1,41 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Navbar from '../components/NavBar';
 import TurnosList from '../components/TurnosList';
-import TurnoForm from '../components/TurnoForm'; // Importar el nuevo formulario
-import { Container, Typography, Button, Box, Modal, Paper } from '@mui/material';
+import TurnoForm from '../components/TurnoForm'; 
+import { getBarberos, getClientes, getServicios, type TurnoFilters } from '../api/api';
+import { useFetch } from '../hooks/useFetch';
+import { ESTADOS_TURNO } from '../types/Turno';
+import { 
+    Container, Typography, Button, Box, Modal, Select, MenuItem, FormControl, InputLabel, TextField, type SelectChangeEvent, CircularProgress
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 const Turnos: React.FC = () => {
-    // Estado para controlar la apertura/cierre del modal del formulario
     const [openForm, setOpenForm] = useState(false);
+    const [listKey, setListKey] = useState(0); 
     
-    // Necesitamos una referencia a la función refetch del TurnosList
-    // Para simplificar, simplemente recargaremos la página de turnos
-    // ya que TurnosList tiene su propia lógica de refetch a través del hook.
-    
-    // La función onSuccess simplemente cierra el modal
-    const handleSuccess = () => {
-        setOpenForm(false);
-        // NOTA: Si TurnosList usa useFetch, el refetch se activará al montarse de nuevo
-        // o si pasamos la función refetch del hook al Turnos.tsx.
-        // Como TurnosList usa su propio useFetch, la forma más simple es confiar en que 
-        // el componente se recargará si se vuelve a montar o, si el componente queda
-        // montado, necesitamos pasarle un prop de recarga.
-        
-        // ¡Simplificamos! El componente TurnosList ya tiene el refetch en su hook.
-        // Si usamos una clave (key) en TurnosList, forzamos la recarga:
+    // 🛑 ESTADO DE LOS FILTROS 🛑
+    const [filters, setFilters] = useState<TurnoFilters>({
+        barberoId: 0,
+        clienteId: 0,
+        servicioId: 0,
+        estado: '',
+        fecha: '',
+    });
+
+    // Cargar listas para los Selects (Barberos, Clientes, Servicios)
+    const { data: barberos, loading: loadingBarberos } = useFetch(getBarberos);
+    const { data: clientes, loading: loadingClientes } = useFetch(getClientes);
+    const { data: servicios, loading: loadingServicios } = useFetch(getServicios);
+
+    // Manejador genérico de filtros
+    const handleFilterChange = (e: SelectChangeEvent<any> | React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+        // Forzar recarga de la lista
         setListKey(prev => prev + 1);
     };
-    
-    // 💡 TÉCNICA CLAVE: Forzar recarga de TurnosList usando 'key'
-    const [listKey, setListKey] = useState(0); 
 
+    const handleSuccess = () => {
+        setOpenForm(false);
+        setListKey(prev => prev + 1); // Forzar recarga de la lista
+    };
+
+    if (loadingBarberos || loadingClientes || loadingServicios) {
+        return (
+            <>
+                <Navbar />
+                <Box sx={{ p: 4, textAlign: 'center' }}><CircularProgress /></Box>
+            </>
+        );
+    }
+    
     return (
         <>
             <Navbar />
-            <Container maxWidth="lg" sx={{ mt: 3 }}>
+            <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', p: 3, bgcolor: '#f4f6f8' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                    <Typography variant="h4" component="h1">
+                    <Typography variant="h4" component="h1" sx={{ color: '#4a148c' }}>
                         Turnos Agendados
                     </Typography>
                     <Button 
@@ -47,9 +70,98 @@ const Turnos: React.FC = () => {
                         Agendar Nuevo Turno
                     </Button>
                 </Box>
+
+                {/* 🛑 BARRA DE FILTROS 🛑 */}
+                <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', bgcolor: 'white', p: 2, borderRadius: 1 }}>
+                    
+                    {/* Filtro por Barbero */}
+                    <FormControl sx={{ minWidth: 150 }}>
+                        <InputLabel>Barbero</InputLabel>
+                        <Select
+                            name="barberoId"
+                            value={filters.barberoId || 0}
+                            label="Barbero"
+                            onChange={handleFilterChange}
+                        >
+                            <MenuItem value={0}>Todos los Barberos</MenuItem>
+                            {barberos?.map((b) => (
+                                <MenuItem key={b.id_barbero} value={b.id_barbero}>
+                                    {b.nombre} {b.apellido}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    {/* Filtro por Cliente */}
+                    <FormControl sx={{ minWidth: 150 }}>
+                        <InputLabel>Cliente</InputLabel>
+                        <Select
+                            name="clienteId"
+                            value={filters.clienteId || 0}
+                            label="Cliente"
+                            onChange={handleFilterChange}
+                        >
+                            <MenuItem value={0}>Todos los Clientes</MenuItem>
+                            {clientes?.map((c) => (
+                                <MenuItem key={c.id_cliente} value={c.id_cliente}>
+                                    {c.nombre} {c.apellido}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    
+                    {/* Filtro por Servicio */}
+                    <FormControl sx={{ minWidth: 150 }}>
+                        <InputLabel>Servicio</InputLabel>
+                        <Select
+                            name="servicioId"
+                            value={filters.servicioId || 0}
+                            label="Servicio"
+                            onChange={handleFilterChange}
+                        >
+                            <MenuItem value={0}>Todos los Servicios</MenuItem>
+                            {servicios?.map((s) => (
+                                <MenuItem key={s.id_servicio} value={s.id_servicio}>
+                                    {s.nombre}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    {/* Filtro por Estado */}
+                    <FormControl sx={{ minWidth: 150 }}>
+                        <InputLabel>Estado</InputLabel>
+                        <Select
+                            name="estado"
+                            value={filters.estado || ''}
+                            label="Estado"
+                            onChange={handleFilterChange}
+                        >
+                            <MenuItem value={''}>Todos los Estados</MenuItem>
+                            {Object.values(ESTADOS_TURNO).map((estado) => (
+                                <MenuItem key={estado} value={estado}>
+                                    {estado.charAt(0).toUpperCase() + estado.slice(1)}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    
+                    {/* Filtro por Fecha */}
+                    <TextField
+                        name="fecha"
+                        label="Fecha Específica"
+                        type="date"
+                        value={filters.fecha}
+                        onChange={handleFilterChange}
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ width: 180 }}
+                    />
+                    
+                </Box>
+                {/* 🛑 FIN BARRA DE FILTROS 🛑 */}
                 
-                {/* Lista de Turnos: Usamos la clave para forzar el re-renderizado después de un POST exitoso */}
-                <TurnosList key={listKey} />
+                {/* Lista de Turnos: Pasamos los filtros y la clave para forzar la recarga */}
+                <TurnosList key={listKey} filters={filters} />
 
                 {/* Modal para el Formulario */}
                 <Modal
@@ -58,15 +170,8 @@ const Turnos: React.FC = () => {
                     aria-labelledby="modal-title"
                 >
                     <Box sx={{ 
-                        position: 'absolute', 
-                        top: '50%', 
-                        left: '50%', 
-                        transform: 'translate(-50%, -50%)', 
-                        width: { xs: '90%', md: 600 }, 
-                        bgcolor: 'background.paper', 
-                        boxShadow: 24, 
-                        p: 4, 
-                        borderRadius: 2
+                        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
+                        width: { xs: '90%', md: 600 }, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2
                     }}>
                         <Typography id="modal-title" variant="h5" component="h2" mb={3}>
                             Agendar Nuevo Turno
@@ -77,7 +182,7 @@ const Turnos: React.FC = () => {
                         />
                     </Box>
                 </Modal>
-            </Container>
+            </Box>
         </>
     );
 };

@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
 import Navbar from '../components/NavBar';
-import BarberosList from '../components/BarberosList';
-import BarberoFormModal from '../components/BarberoFormModal'; // 🛑 Importar Modal
-import type { Barbero } from '../types/Barbero';
+import ClientesList from '../components/ClientesList';
+import ClienteFormModal from '../components/ClienteFormModal'; // 🛑 Importar Modal
+import type { Cliente } from '../types/Cliente';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
-const Barberos: React.FC = () => {
+const Clientes: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedBarbero, setSelectedBarbero] = useState<Barbero | null>(null);
-    const [listKey, setListKey] = useState(0); // Para forzar la recarga de BarberosList
+    const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+    const [listKey, setListKey] = useState(0); // Para forzar la recarga de ClientesList
 
     const handleOpenCreate = () => {
-        setSelectedBarbero(null); // Modo Creación
+        setSelectedCliente(null); // Modo Creación
         setModalOpen(true);
     };
 
-    const handleOpenEdit = (barbero: Barbero) => {
-        setSelectedBarbero(barbero); // Modo Edición
+    const handleOpenEdit = (cliente: Cliente) => {
+        setSelectedCliente(cliente); // Modo Edición
         setModalOpen(true);
     };
 
     const handleSuccess = () => {
         setModalOpen(false);
-        setListKey(prev => prev + 1); // Forzar recarga completa de la lista (incluye Delete/Create/Update)
+        setListKey(prev => prev + 1); // Forzar recarga de la lista
     };
 
     return (
@@ -37,7 +37,7 @@ const Barberos: React.FC = () => {
             }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography variant="h4" component="h1" sx={{ color: '#4a148c' }}>
-                        Administración de Barberos
+                        Administración de Clientes
                     </Typography>
                     <Button 
                         variant="contained" 
@@ -45,26 +45,26 @@ const Barberos: React.FC = () => {
                         startIcon={<AddIcon />}
                         onClick={handleOpenCreate}
                     >
-                        Agregar Barbero
+                        Agregar Cliente
                     </Button>
                 </Box>
                 
-                <BarberosList 
+                <ClientesList 
                     key={listKey}
-                    onEdit={handleOpenEdit} // Función para abrir modal en edición
-                    onRefresh={handleSuccess} // Función para recargar tras una acción (opcional, pero buena práctica)
+                    onEdit={handleOpenEdit} 
+                    onRefresh={handleSuccess} 
                 />
             </Box>
             
             {/* Modal de Crear/Editar */}
-            <BarberoFormModal
+            <ClienteFormModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onSuccess={handleSuccess}
-                barbero={selectedBarbero}
+                cliente={selectedCliente}
             />
         </>
     );
 };
 
-export default Barberos;
+export default Clientes;
