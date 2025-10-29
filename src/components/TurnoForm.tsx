@@ -11,11 +11,12 @@ import {
   MenuItem, 
   FormControl, 
   InputLabel, 
-  Box, // Usaremos Box en lugar de Grid
+  Box, 
   CircularProgress, 
   Typography, 
   Alert, 
-  type SelectChangeEvent
+  type SelectChangeEvent,
+  Autocomplete
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
@@ -36,29 +37,38 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Carga de datos
+  // Carga de datos con errores tipados (AxiosError | null)
   const { data: barberos, loading: loadingBarberos, error: errorBarberos } = useFetch<Barbero[]>(getBarberos);
   const { data: clientes, loading: loadingClientes, error: errorClientes } = useFetch<Cliente[]>(getClientes);
   const { data: servicios, loading: loadingServicios, error: errorServicios } = useFetch<Servicio[]>(getServicios);
 
-  // 🛑 MANEJADOR DE CAMBIOS CORREGIDO Y UNIFICADO 🛑
+  // --- HANDLERS DE CAMBIO ---
+  
+  // Manejador para Selects y TextFields
   const handleChange = (e: SelectChangeEvent<number> | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
-    // Convertir el valor a number si es un campo de ID, o mantenerlo como string (para date/time)
-    const isIdField = name === 'clienteId' || name === 'barberoId' || name === 'servicioId';
-    
-    // Si es un Select (que devuelve string) o un TextField (que devuelve string), procesamos:
+    const isIdField = name === 'barberoId' || name === 'servicioId';
     const processedValue = isIdField ? Number(value) : value;
 
     setFormData(prev => ({
       ...prev,
       [name]: processedValue,
     }));
-    
     setSubmitError(null);
   };
   
+  // Manejador específico para el Autocomplete de Cliente
+  const handleClienteChange = (event: React.SyntheticEvent, value: Cliente | null) => {
+    const clienteId = value ? value.id_cliente : 0;
+    setFormData(prev => ({
+      ...prev,
+      clienteId: clienteId,
+    }));
+    setSubmitError(null);
+  };
+  
+  // --- SUBMIT ---
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.clienteId || !formData.barberoId || !formData.servicioId || !formData.date || !formData.time) {
@@ -82,22 +92,20 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
         onSuccess();
         onClose(); 
     } catch (err: any) {
-        // 🛑 LÓGICA DE CAPTURA DE ERRORES CORREGIDA 🛑
         const serverResponseData = err.response?.data;
-
-        const message = serverResponseData?.mensaje // 1. Captura tu clave personalizada ('mensaje')
-                       || serverResponseData?.message // 2. Captura la clave estándar de NestJS ('message')
-                       || err.message // 3. Mensaje genérico de Axios
-                       || "Error desconocido al agendar el turno.";
-                       
+        const message = serverResponseData?.mensaje || serverResponseData?.message || err.message || "Error desconocido al agendar el turno.";
         setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // 🛑 LÓGICA DE CARGA Y ERROR CORREGIDA 🛑
   const loadingData = loadingBarberos || loadingClientes || loadingServicios;
-  const errorData = errorBarberos || errorClientes || errorServicios;
+  
+  // 🛑 CORRECCIÓN: Chequeamos los errores individualmente 🛑
+  const fetchError = errorBarberos || errorClientes || errorServicios;
+
 
   if (loadingData) {
     return (
@@ -107,9 +115,14 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
     );
   }
 
-  if (errorData) {
-    return <Alert severity="error">Error al cargar datos para el formulario: {errorData.message}</Alert>;
+  // 🛑 CORRECCIÓN: Usamos la variable 'fetchError' 🛑
+  if (fetchError) {
+    return <Alert severity="error">Error al cargar datos para el formulario: {fetchError.message}</Alert>;
   }
+
+  // --- RENDER ---
+  
+  const selectedClienteObject = clientes?.find(c => c.id_cliente === formData.clienteId) || null;
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2, p: 2 }}>
@@ -119,26 +132,27 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
       
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         
-        {/* Fila 1: Cliente y Barbero */}
+        {/* Fila 1: Cliente (Autocomplete) y Barbero */}
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
-          <FormControl fullWidth required sx={{ flex: 1 }}>
-            <InputLabel id="cliente-label">Cliente</InputLabel>
-            <Select
-              labelId="cliente-label"
-              name="clienteId"
-              // El valor del state es number, pero Select lo acepta
-              value={formData.clienteId} 
-              label="Cliente"
-              onChange={handleChange} // 🛑 Usando el handler unificado
-            >
-              <MenuItem value={0} disabled>Selecciona un Cliente</MenuItem> 
-              {clientes?.map((c) => (
-                <MenuItem key={c.id_cliente} value={c.id_cliente}> 
-                  {c.nombre} {c.apellido}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          
+          {/* COMPONENTE AUTOCMPLETE PARA CLIENTES */}
+          <Autocomplete
+            fullWidth
+            sx={{ flex: 1 }}
+            options={clientes || []}
+            getOptionLabel={(option) => `${option.nombre} ${option.apellido} `}
+            value={selectedClienteObject}
+            onChange={handleClienteChange}
+            isOptionEqualToValue={(option, value) => option.id_cliente === value.id_cliente}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                required={!formData.clienteId} 
+                label="Buscar Cliente" 
+              />
+            )}
+            disabled={loadingClientes}
+          />
           
           <FormControl fullWidth required sx={{ flex: 1 }}>
             <InputLabel id="barbero-label">Barbero</InputLabel>
@@ -147,7 +161,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
               name="barberoId"
               value={formData.barberoId}
               label="Barbero"
-              onChange={handleChange} // 🛑 Usando el handler unificado
+              onChange={handleChange}
             >
               <MenuItem value={0} disabled>Selecciona un Barbero</MenuItem>
               {barberos?.filter(b => b.activo).map((b) => (
@@ -167,7 +181,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
             name="servicioId"
             value={formData.servicioId}
             label="Servicio"
-            onChange={handleChange} // 🛑 Usando el handler unificado
+            onChange={handleChange} 
           >
             <MenuItem value={0} disabled>Selecciona un Servicio</MenuItem>
             {servicios?.map((s) => (
@@ -187,7 +201,6 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
             type="date"
             name="date"
             value={formData.date}
-            // 🛑 El handler es compatible con TextField
             onChange={handleChange} 
             InputLabelProps={{ shrink: true }}
             sx={{ flex: 1 }}
@@ -199,7 +212,6 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
             type="time"
             name="time"
             value={formData.time}
-            // 🛑 El handler es compatible con TextField
             onChange={handleChange}
             InputLabelProps={{ shrink: true }}
             sx={{ flex: 1 }}

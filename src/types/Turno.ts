@@ -3,7 +3,7 @@ import type{ Cliente } from './Cliente';
 import type { Servicio } from './Servicio';
 
 // Reflejando la estructura completa del Turno
-export type EstadoTurno = 'pendiente' | 'confirmado' | 'cancelado';
+export type EstadoTurno = 'pendiente' | 'realizado' | 'cancelado' | 'en proceso';
 
 export interface Turno {
   id_turno: number; // Clave primaria
