@@ -26,6 +26,8 @@ const modalStyle = {
     borderRadius: 2,
 };
 
+const INITIAL_FORM_DATA = { nombre: '', apellido: '', telefono: '', activo: true };
+
 const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSuccess, barbero }) => {
     const isEdit = !!barbero;
     
@@ -36,6 +38,12 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
     
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+
+    // Función auxiliar para resetear el formulario
+    const resetForm = () => {
+        setFormData(INITIAL_FORM_DATA);
+        setSubmitError(null);
+    };
 
     // 🛑 Lógica para precargar el formulario en modo EDICIÓN 🛑
     useEffect(() => {
@@ -48,7 +56,7 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
             });
         } else {
             // Resetear para modo CREACIÓN
-            setFormData({ nombre: '', apellido: '', telefono: '', activo: true });
+            setFormData(INITIAL_FORM_DATA);
         }
     }, [barbero]);
 
@@ -86,6 +94,8 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
                     telefono: formData.telefono,
                 };
                 await createBarbero(createDto);
+
+                resetForm();    // Limpiar el formulario tras crear un nuevo barbero
             }
             
             onSuccess(); // Cierra el modal y refresca la lista

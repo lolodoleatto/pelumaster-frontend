@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import ReportSummaryCard from '../components/ReportSummaryCard';
+import CortesPorDiaChart from '../components/CortesPorDiaChart'; 
 import { useFetch } from '../hooks/useFetch';
 import { getBarberos, getReporteBarbero, type ReporteBarbero } from '../api/api';
 import type { Barbero } from '../types/Barbero';
-import { type Turno, ESTADOS_TURNO } from '../types/Turno'; // 🛑 Importamos ESTADOS_TURNO y Turno
+import { type Turno, ESTADOS_TURNO } from '../types/Turno'; 
 
 import {
     Container, Paper, Typography, Box, CircularProgress, Alert, 
@@ -20,20 +21,20 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 const getStatusColor = (estado: string): 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning' | 'info' => {
     switch (estado) {
         case ESTADOS_TURNO.REALIZADO:
-            return 'success'; // Verde
+            return 'success'; 
         case ESTADOS_TURNO.CANCELADO:
-            return 'error'; // Rojo
+            return 'error'; 
         case ESTADOS_TURNO.EN_PROCESO:
-            return 'info'; // Celeste/Azul
+            return 'info'; 
         case ESTADOS_TURNO.PENDIENTE:
-            return 'warning'; // Naranja
+            return 'warning'; 
         default:
             return 'default';
     }
 };
 
 const Reportes: React.FC = () => {
-    const theme = useTheme(); // Acceso al tema para estilos dinámicos
+    const theme = useTheme(); 
     
     // 🛑 ESTADOS 🛑
     const [barberoId, setBarberoId] = useState<number>(0);
@@ -172,47 +173,59 @@ const Reportes: React.FC = () => {
                     <React.Fragment>
                         
                         {
-                            // 🟢 Lógica de cálculo 
+                            // 🟢 Lógica de cálculo (Cards)
                             (() => {
-                                const turnosActivos = reporte.turnos.filter((t: Turno) => t.estado !== 'cancelado');
+                                const turnosActivos = reporte.turnos.filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO);
                                 
                                 const gananciaBruta = turnosActivos.reduce((sum, turno) => {
-                                    return sum + (Number(turno.servicio.precio) || 0);
+                                    return sum + (parseFloat(String(turno.servicio.precio)) || 0); 
                                 }, 0);
 
-                                const turnosRealizadosCount = reporte.turnos.filter((t: Turno) => t.estado === 'realizado').length;
+                                const turnosRealizadosCount = reporte.turnos.filter((t: Turno) => t.estado === ESTADOS_TURNO.REALIZADO ).length;
 
                                 return (
-                                    <Box 
-                                        sx={{ 
-                                            display: 'flex', 
-                                            flexWrap: 'wrap', 
-                                            gap: 3, 
-                                            mb: 4 
-                                        }}
-                                    > 
-                                        {/* Card 1: Total de Turnos (No Cancelados) */}
-                                        <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)', lg: 'calc(33% - 16px)' } }}> 
-                                            <ReportSummaryCard 
-                                                title="TOTAL DE TURNOS"
-                                                metric={turnosActivos.length}
-                                                icon={<EventAvailableIcon />}
-                                                color={theme.palette.info.main} // Usa el color 'info' del tema
-                                                subText={`Turnos realizados: ${turnosRealizadosCount}`}
-                                            />
-                                        </Box>
+                                    <React.Fragment>
+                                        {/* 🛑 FILA 1: TARJETAS DE MÉTRICAS (FLEX ROW) 🛑 */}
+                                        <Box 
+                                            sx={{ 
+                                                display: 'flex', 
+                                                flexWrap: 'wrap', 
+                                                gap: 3, 
+                                                mb: 4 
+                                            }}
+                                        > 
+                                            {/* Card 1: Total de Turnos */}
+                                            <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}> 
+                                                <ReportSummaryCard 
+                                                    title="TOTAL DE TURNOS (Activos)"
+                                                    metric={turnosActivos.length}
+                                                    icon={<EventAvailableIcon />}
+                                                    color={theme.palette.info.main} 
+                                                    subText={`Turnos realizados: ${turnosRealizadosCount}`}
+                                                />
+                                            </Box>
 
-                                        {/* Card 2: Ganancia Total (No Cancelados) */}
-                                        <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)', lg: 'calc(33% - 16px)' } }}>
-                                            <ReportSummaryCard 
-                                                title="VALOR BRUTO DE TURNOS"
-                                                metric={`$${gananciaBruta.toFixed(2)}`}
-                                                icon={<AttachMoneyIcon />}
-                                                color={theme.palette.success.main} // Usa el color 'success' del tema
-                                                subText={`Barbero: ${barberoSeleccionado?.nombre || 'N/A'}`}
+                                            {/* Card 2: Ganancia Total */}
+                                            <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
+                                                <ReportSummaryCard 
+                                                    title="VALOR BRUTO DE TURNOS"
+                                                    metric={`$${gananciaBruta.toFixed(2)}`}
+                                                    icon={<AttachMoneyIcon />}
+                                                    color={theme.palette.success.main} 
+                                                    subText={`Barbero: ${barberoSeleccionado?.nombre || 'N/A'}`}
+                                                />
+                                            </Box>
+                                        </Box>
+                                        
+                                        {/* 🛑 FILA 2: GRÁFICO (100% ANCHO) 🛑 */}
+                                        <Box sx={{ width: '100%', mb: 4 }}> 
+                                            <CortesPorDiaChart 
+                                                turnos={reporte.turnos} 
+                                                barberoNombre={barberoSeleccionado?.nombre || 'General'}
                                             />
                                         </Box>
-                                    </Box>
+                                        
+                                    </React.Fragment>
                                 );
                             })()
                         }
@@ -235,31 +248,29 @@ const Reportes: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {/* 🛑 AQUÍ USAMOS EL FILTRADO Y EL MAPEO DE COLOR 🛑 */}
                                         {reporte.turnos
-                                          .filter((t: Turno) => t.estado !== 'cancelado') // Muestra solo los no cancelados
-                                          .map((turno) => (
-                                            <TableRow key={turno.id_turno}>
-                                                <TableCell>{new Date(turno.fecha_hora).toLocaleDateString()}</TableCell>
-                                                <TableCell>{turno.cliente.nombre} {turno.cliente.apellido}</TableCell>
-                                                <TableCell>{turno.servicio.nombre}</TableCell>
-                                                <TableCell align="right">${Number(turno.servicio.precio).toFixed(2)}</TableCell>
-                                                <TableCell>
-                                                    <Chip 
-                                                        label={turno.estado.toUpperCase()} 
-                                                        size="small" 
-                                                        // 🟢 USAMOS LA FUNCIÓN DE COLOR 🟢
-                                                        color={getStatusColor(turno.estado)} 
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
+                                            .filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO) 
+                                            .map((turno) => (
+                                                <TableRow key={turno.id_turno}>
+                                                    <TableCell>{new Date(turno.fecha_hora).toLocaleDateString()}</TableCell>
+                                                    <TableCell>{turno.cliente.nombre} {turno.cliente.apellido}</TableCell>
+                                                    <TableCell>{turno.servicio.nombre}</TableCell>
+                                                    <TableCell align="right">${parseFloat(String(turno.servicio.precio)).toFixed(2)}</TableCell>
+                                                    <TableCell>
+                                                        <Chip 
+                                                            label={turno.estado.toUpperCase()} 
+                                                            size="small" 
+                                                            color={getStatusColor(turno.estado)} 
+                                                        />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
                                         }
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                             
-                            {reporte.turnos.filter((t: Turno) => t.estado !== 'cancelado').length === 0 && (
+                            {reporte.turnos.filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO).length === 0 && (
                                 <Alert severity="info" sx={{ mt: 2 }}>No se encontraron turnos activos en el rango seleccionado.</Alert>
                             )}
                         </Paper>

@@ -32,6 +32,8 @@ type FormState = Omit<CreateServicioDto, 'precio' | 'duracion_minutos'> & {
     descripcion: string; // Aseguramos que es string
 };
 
+const INITIAL_FORM_DATA = { nombre: '', precio: '', duracion_minutos: '', descripcion: '' };
+
 const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, onSuccess, servicio }) => {
     const isEdit = !!servicio;
     
@@ -41,6 +43,11 @@ const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, on
     
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+
+    const resetForm = () => {
+        setFormData(INITIAL_FORM_DATA);
+        setSubmitError(null);
+    };
 
     // Lógica para precargar el formulario en modo EDICIÓN
     useEffect(() => {
@@ -53,6 +60,7 @@ const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, on
             });
         } else {
             setFormData({ nombre: '', precio: '', duracion_minutos: '', descripcion: '' });
+            setFormData(INITIAL_FORM_DATA);
         }
     }, [servicio]);
 
@@ -99,6 +107,7 @@ const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, on
             } else {
                 // Modo CREACIÓN
                 await createServicio(dataToSubmit);
+                resetForm();    // Limpiar el formulario tras crear un nuevo servicio
             }
             
             onSuccess();

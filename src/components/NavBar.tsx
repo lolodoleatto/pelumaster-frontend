@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
           to="/" 
           sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
         >
-          PeluMaster 💈
+          PeluMaster
         </Typography>
 
         {/* Botones de Navegación */}

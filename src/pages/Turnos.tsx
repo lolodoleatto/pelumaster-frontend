@@ -6,15 +6,16 @@ import { getBarberos, getClientes, getServicios, type TurnoFilters } from '../ap
 import { useFetch } from '../hooks/useFetch';
 import { ESTADOS_TURNO } from '../types/Turno';
 import {
-    Typography, Button, Box, Modal, Select, MenuItem, FormControl, InputLabel, TextField, type SelectChangeEvent, CircularProgress, useTheme
+    Typography, Button, Box, Modal, Select, MenuItem, FormControl, InputLabel, TextField, type SelectChangeEvent, CircularProgress, useTheme,
+    Autocomplete // Autocomplete para la búsqueda de clientes
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import type { Cliente } from '../types/Cliente'; // Importar Cliente
 
 const Turnos: React.FC = () => {
-    // 🛑 ACCEDEMOS AL TEMA 🛑
     const theme = useTheme(); 
     const [openForm, setOpenForm] = useState(false);
-    const [listKey, setListKey] = useState(0);
+    const [listKey, setListKey] = useState(0); // Para forzar el refetch
 
     const [filters, setFilters] = useState<TurnoFilters>({
         barberoId: 0,
@@ -26,8 +27,9 @@ const Turnos: React.FC = () => {
 
     const { data: barberos, loading: loadingBarberos } = useFetch(getBarberos);
     const { data: clientes, loading: loadingClientes } = useFetch(getClientes);
-    const { data: servicios, loading: loadingLoadingServicios } = useFetch(getServicios);
+    const { data: servicios, loading: loadingServicios } = useFetch(getServicios);
 
+    // Manejador UNIFICADO para Select y TextField (no-Autocomplete)
     const handleFilterChange = (e: SelectChangeEvent<any> | React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFilters(prev => ({
@@ -36,13 +38,27 @@ const Turnos: React.FC = () => {
         }));
         setListKey(prev => prev + 1);
     };
-
-    const handleSuccess = () => {
-        setOpenForm(false);
+    
+    // Manejador ESPECÍFICO para el Autocomplete de Cliente
+    const handleClienteFilterChange = (event: React.SyntheticEvent, value: Cliente | null) => {
+        const clienteId = value ? value.id_cliente : 0;
+        setFilters(prev => ({
+            ...prev,
+            clienteId: clienteId,
+        }));
         setListKey(prev => prev + 1);
     };
 
-    if (loadingBarberos || loadingClientes || loadingLoadingServicios) {
+    const handleSuccess = () => {
+        setOpenForm(false);
+        setListKey(prev => prev + 1); // Forzar recarga de la lista tras crear un turno
+    };
+    
+    // Buscar el objeto cliente actualmente seleccionado para Autocomplete
+    const selectedClienteFilter = clientes?.find(c => c.id_cliente === filters.clienteId) || null;
+
+
+    if (loadingBarberos || loadingClientes || loadingServicios) {
         return (
             <DashboardLayout title="Cargando...">
                 <Box sx={{ p: 4, textAlign: 'center', mt: 8 }}>
@@ -61,7 +77,7 @@ const Turnos: React.FC = () => {
                     <Typography 
                         variant="h4" 
                         component="h1" 
-                        color="primary" // Usa el color primario (Celeste) del tema
+                        color="primary" 
                     >
                         Turnos Agendados
                     </Typography>
@@ -83,13 +99,12 @@ const Turnos: React.FC = () => {
                         mb: 4, 
                         flexWrap: 'wrap', 
                         p: 2, 
-                        // 🛑 CORRECCIÓN: Usa el color de la paleta para el fondo 🛑
-                        // bgcolor: theme.palette.background.paper, 
+                        bgcolor: theme.palette.background.paper, 
                         borderRadius: 1 
                     }}
                 >
-                    {/* Filtro por Barbero */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }}>
+                    {/* Filtro por Barbero (SELECT) */}
+                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> {/* 🛑 size="small" */}
                         <InputLabel>Barbero</InputLabel>
                         <Select
                             name="barberoId"
@@ -106,26 +121,28 @@ const Turnos: React.FC = () => {
                         </Select>
                     </FormControl>
 
-                    {/* Filtro por Cliente */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }}>
-                        <InputLabel>Cliente</InputLabel>
-                        <Select
-                            name="clienteId"
-                            value={filters.clienteId || 0}
-                            label="Cliente"
-                            onChange={handleFilterChange}
-                        >
-                            <MenuItem value={0}>Todos los Clientes</MenuItem>
-                            {clientes?.map((c) => (
-                                <MenuItem key={c.id_cliente} value={c.id_cliente}>
-                                    {c.nombre} {c.apellido}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {/* Filtro por Cliente (AUTOCMPLETE) */}
+                    <Box sx={{ minWidth: 150, flexGrow: 1 }}>
+                        <Autocomplete
+                            options={clientes || []}
+                            getOptionLabel={(option) => `${option.nombre} ${option.apellido}`}
+                            value={selectedClienteFilter}
+                            onChange={handleClienteFilterChange}
+                            isOptionEqualToValue={(option, value) => option.id_cliente === value.id_cliente}
+                            renderInput={(params) => (
+                                <TextField 
+                                    {...params} 
+                                    label="Buscar Cliente" 
+                                    size="small" // 🛑 size="small"
+                                />
+                            )}
+                            clearText="Limpiar"
+                            selectOnFocus
+                        />
+                    </Box>
 
-                    {/* Filtro por Servicio */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }}>
+                    {/* Filtro por Servicio (SELECT) */}
+                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> {/* 🛑 size="small" */}
                         <InputLabel>Servicio</InputLabel>
                         <Select
                             name="servicioId"
@@ -142,8 +159,8 @@ const Turnos: React.FC = () => {
                         </Select>
                     </FormControl>
 
-                    {/* Filtro por Estado */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }}>
+                    {/* Filtro por Estado (SELECT) */}
+                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> {/* 🛑 size="small" */}
                         <InputLabel>Estado</InputLabel>
                         <Select
                             name="estado"
@@ -152,16 +169,15 @@ const Turnos: React.FC = () => {
                             onChange={handleFilterChange}
                         >
                             <MenuItem value={''}>Todos los Estados</MenuItem>
-                            {/* ESTADOS_TURNO contiene 'pendiente', 'realizado', etc. */}
                             {Object.values(ESTADOS_TURNO).map((estado) => (
                                 <MenuItem key={estado} value={estado}>
-                                    {estado.charAt(0).toUpperCase() + estado.slice(1)}
+                                    {estado.charAt(0).toUpperCase() + estado.slice(1).replace('_', ' ')}
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                     
-                    {/* Filtro por Fecha */}
+                    {/* Filtro por Fecha (TEXTFIELD) */}
                     <TextField
                         sx={{ minWidth: 150, flexGrow: 1 }} 
                         name="fecha"
@@ -170,6 +186,7 @@ const Turnos: React.FC = () => {
                         value={filters.fecha}
                         onChange={handleFilterChange}
                         InputLabelProps={{ shrink: true }}
+                        size="small" // 🛑 size="small"
                     />
 
                 </Box>
@@ -186,7 +203,6 @@ const Turnos: React.FC = () => {
                     <Box sx={{
                         position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
                         width: { xs: '90%', md: 600 }, 
-                        // 🛑 CORRECCIÓN: Usa el color de fondo del Paper/Modal del tema 🛑
                         bgcolor: theme.palette.background.paper, 
                         boxShadow: 24, p: 4, borderRadius: 2
                     }}>
@@ -194,7 +210,6 @@ const Turnos: React.FC = () => {
                             Agendar Nuevo Turno
                         </Typography>
                         <TurnoForm
-                            open={openForm} 
                             onSuccess={handleSuccess}
                             onClose={() => setOpenForm(false)}
                         />
