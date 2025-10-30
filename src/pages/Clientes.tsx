@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import Navbar from '../components/NavBar';
 import ClientesList from '../components/ClientesList';
 import ClienteFormModal from '../components/ClienteFormModal'; // 🛑 Importar Modal
 import type { Cliente } from '../types/Cliente';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DashboardLayout from '../components/DashboardLayout';
 
 const Clientes: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -28,41 +28,44 @@ const Clientes: React.FC = () => {
 
     return (
         <>
-            <Navbar />
-            <Box sx={{ 
-                width: '100%', 
-                minHeight: 'calc(100vh - 64px)', 
-                p: 3, 
-                bgcolor: '#f4f6f8' 
-            }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                    <Typography variant="h4" component="h1" sx={{ color: '#4a148c' }}>
-                        Administración de Clientes
-                    </Typography>
-                    <Button 
-                        variant="contained" 
-                        color="primary" 
-                        startIcon={<AddIcon />}
-                        onClick={handleOpenCreate}
-                    >
-                        Agregar Cliente
-                    </Button>
+            <DashboardLayout title="Gestión de Servicios">
+
+                <Box sx={{
+                    width: '100%',
+                    minHeight: 'calc(100vh - 64px)',
+                    p: 3,
+                    bgcolor: '#f4f6f8'
+                }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                        <Typography variant="h4" component="h1" sx={{ color: '#4a148c' }}>
+                            Administración de Clientes
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={handleOpenCreate}
+                        >
+                            Agregar Cliente
+                        </Button>
+                    </Box>
+
+                    <ClientesList
+                        key={listKey}
+                        onEdit={handleOpenEdit}
+                        onRefresh={handleSuccess}
+                    />
                 </Box>
-                
-                <ClientesList 
-                    key={listKey}
-                    onEdit={handleOpenEdit} 
-                    onRefresh={handleSuccess} 
+
+                {/* Modal de Crear/Editar */}
+                <ClienteFormModal
+                    open={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onSuccess={handleSuccess}
+                    cliente={selectedCliente}
                 />
-            </Box>
-            
-            {/* Modal de Crear/Editar */}
-            <ClienteFormModal
-                open={modalOpen}
-                onClose={() => setModalOpen(false)}
-                onSuccess={handleSuccess}
-                cliente={selectedCliente}
-            />
+            </DashboardLayout>
+
         </>
     );
 };

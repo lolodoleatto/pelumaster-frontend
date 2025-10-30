@@ -7,6 +7,7 @@ import Barberos from './pages/Barberos';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import Clientes from './pages/Clientes';
 import Servicios from './pages/Servicios';
+import Reportes from './pages/Reportes';
 
 // Define un tema básico de MUI (opcional, pero mejora la estética)
 const theme = createTheme({
@@ -33,6 +34,7 @@ function App() {
           <Route path="/barberos" element={<Barberos />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/servicios" element={<Servicios />} />
+          <Route path="/reportes" element={<Reportes />} />
           <Route path="*" element={
             <div style={{ textAlign: 'center', marginTop: '50px' }}>
               <h1>404 - Página no encontrada</h1>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import Navbar from '../components/NavBar';
 import ServiciosList from '../components/ServiciosList';
 import ServicioFormModal from '../components/ServicioFormModal'; 
 import type { Servicio } from '../types/Servicio';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DashboardLayout from '../components/DashboardLayout';
 
 const Servicios: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
@@ -28,7 +28,7 @@ const Servicios: React.FC = () => {
 
     return (
         <>
-            <Navbar />
+        <DashboardLayout title="Gestión de Servicios">
             <Box sx={{ 
                 width: '100%', 
                 minHeight: 'calc(100vh - 64px)', 
@@ -63,6 +63,7 @@ const Servicios: React.FC = () => {
                 onSuccess={handleSuccess}
                 servicio={selectedServicio}
             />
+            </DashboardLayout>
         </>
     );
 };

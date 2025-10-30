@@ -178,3 +178,42 @@ export const updateServicio = async (id: number, updatedFields: UpdateServicioDt
 export const deleteServicio = async (id: number): Promise<void> => {
   await api.delete(`/servicios/${id}`);
 };
+
+
+// Al final de la sección de funciones CRUD de Turno (o al final del archivo)
+
+/**
+ * Obtiene el reporte de turnos y ganancias de un barbero con filtros opcionales de fecha.
+ * Endpoint: GET /reportes/barbero/:id?desde=...&hasta=...
+ */
+export const getReporteBarbero = async (
+    barberoId: number, 
+    desde?: string, 
+    hasta?: string
+): Promise<ReporteBarbero> => {
+    let url = `/reportes/barbero/${barberoId}`;
+    const params = new URLSearchParams();
+
+    // 1. Construir parámetros de filtro
+    if (desde) params.append('desde', desde);
+    if (hasta) params.append('hasta', hasta);
+
+    // 2. Adjuntar parámetros a la URL
+    if (params.toString()) {
+        url += `?${params.toString()}`;
+    }
+
+    // 3. Realizar la petición
+    const response = await api.get<ReporteBarbero>(url);
+    return response.data;
+};
+
+export interface ReporteBarbero {
+    id_barbero: number;
+    totalTurnos: number;
+    totalGanancias: number; // Tu backend devuelve un número aquí
+    desde?: string;
+    hasta?: string;
+    turnos: Turno[]; // Lista detallada de turnos
+}
+
