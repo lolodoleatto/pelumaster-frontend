@@ -5,7 +5,8 @@ import MuiAppBar, { type AppBarProps as MuiAppBarProps } from '@mui/material/App
 import MuiDrawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { mainListItems } from './DashboardNavItems'; 
+import { mainListItems } from './DashboardNavItems';
+import customTheme from '../themes/theme';
 
 const drawerWidth: number = 240;
 
@@ -57,8 +58,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// 🛑 Usa tu tema principal aquí si lo definiste en App.tsx, o deja el default
-const defaultTheme = createTheme(); 
+
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -72,7 +72,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title }) =>
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={customTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         

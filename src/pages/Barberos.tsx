@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import BarberosList from '../components/BarberosList';
-import BarberoFormModal from '../components/BarberoFormModal'; // 🛑 Importar Modal
+import BarberoFormModal from '../components/BarberoFormModal';
 import type { Barbero } from '../types/Barbero';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DashboardLayout from '../components/DashboardLayout';
+import { useTheme } from '@mui/material/styles'; // 🛑 Importamos useTheme para usar el espaciado y colores
 
 const Barberos: React.FC = () => {
+    // 🛑 ACCEDEMOS AL TEMA 🛑
+    const theme = useTheme();
+
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedBarbero, setSelectedBarbero] = useState<Barbero | null>(null);
-    const [listKey, setListKey] = useState(0); // Para forzar la recarga de BarberosList
+    const [listKey, setListKey] = useState(0);
 
     const handleOpenCreate = () => {
         setSelectedBarbero(null); // Modo Creación
@@ -23,50 +27,51 @@ const Barberos: React.FC = () => {
 
     const handleSuccess = () => {
         setModalOpen(false);
-        setListKey(prev => prev + 1); // Forzar recarga completa de la lista (incluye Delete/Create/Update)
+        setListKey(prev => prev + 1); // Forzar recarga de la lista
     };
 
     return (
-        <>
-            <DashboardLayout title="Gestión de Servicios">
+        <DashboardLayout title="Administración de Barberos"> {/* 🛑 Título Ajustado 🛑 */}
 
-                <Box sx={{
-                    width: '100%',
-                    minHeight: 'calc(100vh - 64px)',
-                    p: 3,
-                    bgcolor: '#f4f6f8'
-                }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                        <Typography variant="h4" component="h1" sx={{ color: '#4a148c' }}>
-                            Administración de Barberos
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            onClick={handleOpenCreate}
-                        >
-                            Agregar Barbero
-                        </Button>
-                    </Box>
-
-                    <BarberosList
-                        key={listKey}
-                        onEdit={handleOpenEdit} // Función para abrir modal en edición
-                        onRefresh={handleSuccess} // Función para recargar tras una acción (opcional, pero buena práctica)
-                    />
+            {/* 🛑 ELIMINAMOS ESTILOS FIJOS (bgcolor, minHeight) y el Fragment vacío (<> </>) 🛑 */}
+            <Box sx={{
+                // Usamos el spacing del tema para el padding superior e inferior
+                padding: theme.spacing(3),
+            }}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                    <Typography
+                        variant="h4"
+                        component="h1"
+                        color="primary" // Usamos el color primario del tema (Celeste)
+                    >
+                        Catálogo de Barberos
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={handleOpenCreate}
+                    >
+                        Agregar Barbero
+                    </Button>
                 </Box>
 
-                {/* Modal de Crear/Editar */}
-                <BarberoFormModal
-                    open={modalOpen}
-                    onClose={() => setModalOpen(false)}
-                    onSuccess={handleSuccess}
-                    barbero={selectedBarbero}
+                <BarberosList
+                    key={listKey}
+                    onEdit={handleOpenEdit}
+                    onRefresh={handleSuccess}
+                // No es necesario onRefresh si usas onEdit, pero lo mantendremos para consistencia
                 />
-            </DashboardLayout>
+            </Box>
 
-        </>
+            {/* Modal de Crear/Editar */}
+            <BarberoFormModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSuccess={handleSuccess}
+                barbero={selectedBarbero}
+            />
+        </DashboardLayout>
     );
 };
 

@@ -4,20 +4,37 @@ import ReportSummaryCard from '../components/ReportSummaryCard';
 import { useFetch } from '../hooks/useFetch';
 import { getBarberos, getReporteBarbero, type ReporteBarbero } from '../api/api';
 import type { Barbero } from '../types/Barbero';
-import { type Turno } from '../types/Turno'; // Asegúrate de que esta importación sea correcta
+import { type Turno, ESTADOS_TURNO } from '../types/Turno'; // 🛑 Importamos ESTADOS_TURNO y Turno
 
 import {
-    Container, Paper, Typography, Box, CircularProgress, Alert,
-    FormControl, InputLabel, Select, MenuItem, Button, TextField, Stack,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip
+    Container, Paper, Typography, Box, CircularProgress, Alert, 
+    FormControl, InputLabel, Select, MenuItem, Button, TextField, Stack, 
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, useTheme
 } from '@mui/material';
 
 // Importación de Íconos
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 
+// 🟢 FUNCIÓN CENTRALIZADA PARA EL COLOR DEL CHIP 🟢
+const getStatusColor = (estado: string): 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning' | 'info' => {
+    switch (estado) {
+        case ESTADOS_TURNO.REALIZADO:
+            return 'success'; // Verde
+        case ESTADOS_TURNO.CANCELADO:
+            return 'error'; // Rojo
+        case ESTADOS_TURNO.EN_PROCESO:
+            return 'info'; // Celeste/Azul
+        case ESTADOS_TURNO.PENDIENTE:
+            return 'warning'; // Naranja
+        default:
+            return 'default';
+    }
+};
 
 const Reportes: React.FC = () => {
+    const theme = useTheme(); // Acceso al tema para estilos dinámicos
+    
     // 🛑 ESTADOS 🛑
     const [barberoId, setBarberoId] = useState<number>(0);
     const [fechaDesde, setFechaDesde] = useState('');
@@ -52,8 +69,6 @@ const Reportes: React.FC = () => {
 
     const barberoSeleccionado = barberos?.find(b => b.id_barbero === barberoId);
 
-    // ... (Estados de carga y error inicial)
-
     if (loadingBarberos) {
         return (
             <DashboardLayout title="Reportes y Análisis">
@@ -76,19 +91,18 @@ const Reportes: React.FC = () => {
     // 🛑 CONTENIDO PRINCIPAL 🛑
     return (
         <DashboardLayout title="Reportes y Análisis">
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}> 
 
                 {/* 1. SECCIÓN DE FILTROS */}
                 <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
                     <Box component="form" onSubmit={generarReporte}>
-                        <Stack
-                            direction={{ xs: 'column', sm: 'row' }}
-                            spacing={2}
+                        <Stack 
+                            direction={{ xs: 'column', sm: 'row' }} 
+                            spacing={2} 
                             alignItems={{ xs: 'stretch', sm: 'center' }}
                         >
-
                             {/* Selector de Barbero */}
-                            <Box sx={{ flex: '0 0 30%' }}>
+                            <Box sx={{ flex: '0 0 30%' }}> 
                                 <FormControl fullWidth required>
                                     <InputLabel id="barbero-select-label">Seleccionar Barbero</InputLabel>
                                     <Select
@@ -130,13 +144,13 @@ const Reportes: React.FC = () => {
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </Box>
-
+                            
                             {/* Botón de Generar */}
                             <Box sx={{ flex: '0 0 15%' }}>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    color="primary"
+                                <Button 
+                                    type="submit" 
+                                    variant="contained" 
+                                    color="primary" 
                                     fullWidth
                                     disabled={barberoId === 0 || loadingReporte}
                                     sx={{ height: '56px' }}
@@ -156,14 +170,12 @@ const Reportes: React.FC = () => {
 
                 {reporte && (
                     <React.Fragment>
-                        {/* 🟢 LÓGICA DE FILTRADO Y CÁLCULO DE MÉTRICAS 🟢 */}
-
-                        {/* 1. Filtrar turnos: Incluye realizado, en proceso, pendiente. EXCLUYE solo 'cancelado' */}
-                        {/* Nota: Las variables deben declararse dentro de un bloque de expresión JSX si no están en el alcance superior */}
+                        
                         {
+                            // 🟢 Lógica de cálculo 
                             (() => {
                                 const turnosActivos = reporte.turnos.filter((t: Turno) => t.estado !== 'cancelado');
-
+                                
                                 const gananciaBruta = turnosActivos.reduce((sum, turno) => {
                                     return sum + (Number(turno.servicio.precio) || 0);
                                 }, 0);
@@ -171,32 +183,32 @@ const Reportes: React.FC = () => {
                                 const turnosRealizadosCount = reporte.turnos.filter((t: Turno) => t.estado === 'realizado').length;
 
                                 return (
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            flexWrap: 'wrap',
-                                            gap: 3,
-                                            mb: 4
+                                    <Box 
+                                        sx={{ 
+                                            display: 'flex', 
+                                            flexWrap: 'wrap', 
+                                            gap: 3, 
+                                            mb: 4 
                                         }}
-                                    >
+                                    > 
                                         {/* Card 1: Total de Turnos (No Cancelados) */}
-                                        <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)', lg: 'calc(33% - 16px)' } }}>
-                                            <ReportSummaryCard
+                                        <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)', lg: 'calc(33% - 16px)' } }}> 
+                                            <ReportSummaryCard 
                                                 title="TOTAL DE TURNOS"
-                                                metric={turnosActivos.length} // Turnos no cancelados
+                                                metric={turnosActivos.length}
                                                 icon={<EventAvailableIcon />}
-                                                color="#03A9F4"
+                                                color={theme.palette.info.main} // Usa el color 'info' del tema
                                                 subText={`Turnos realizados: ${turnosRealizadosCount}`}
                                             />
                                         </Box>
 
-                                        {/* Card 2: Valor Bruto (No Cancelados) */}
+                                        {/* Card 2: Ganancia Total (No Cancelados) */}
                                         <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)', lg: 'calc(33% - 16px)' } }}>
-                                            <ReportSummaryCard
+                                            <ReportSummaryCard 
                                                 title="VALOR BRUTO DE TURNOS"
-                                                metric={`$${gananciaBruta.toFixed(2)}`} // Ganancia de turnos no cancelados
+                                                metric={`$${gananciaBruta.toFixed(2)}`}
                                                 icon={<AttachMoneyIcon />}
-                                                color="#4CAF50"
+                                                color={theme.palette.success.main} // Usa el color 'success' del tema
                                                 subText={`Barbero: ${barberoSeleccionado?.nombre || 'N/A'}`}
                                             />
                                         </Box>
@@ -210,11 +222,11 @@ const Reportes: React.FC = () => {
                             <Typography variant="h5" gutterBottom>
                                 Detalle de Turnos
                             </Typography>
-
+                            
                             <TableContainer component={Paper} variant="outlined">
                                 <Table size="small">
                                     <TableHead>
-                                        <TableRow sx={{ bgcolor: 'grey.100' }}>
+                                        <TableRow>
                                             <TableCell>Fecha</TableCell>
                                             <TableCell>Cliente</TableCell>
                                             <TableCell>Servicio</TableCell>
@@ -223,36 +235,30 @@ const Reportes: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {/* 🛑 FILTRADO AQUÍ: SOLO MUESTRA TURNOS NO CANCELADOS EN LA TABLA 🛑 */}
+                                        {/* 🛑 AQUÍ USAMOS EL FILTRADO Y EL MAPEO DE COLOR 🛑 */}
                                         {reporte.turnos
-                                            .filter((t: Turno) => t.estado !== 'cancelado')
-                                            .map((turno) => (
-                                                <TableRow key={turno.id_turno}>
-                                                    <TableCell>{new Date(turno.fecha_hora).toLocaleDateString()}</TableCell>
-                                                    <TableCell>{turno.cliente.nombre} {turno.cliente.apellido}</TableCell>
-                                                    <TableCell>{turno.servicio.nombre}</TableCell>
-                                                    <TableCell align="right">${Number(turno.servicio.precio).toFixed(2)}</TableCell>
-                                                    <TableCell>
-                                                        {/* 🛑 LÓGICA DE COLOR CORREGIDA (Usando el patrón completo) 🛑 */}
-                                                        <Chip
-                                                            label={turno.estado.toUpperCase()}
-                                                            size="small"
-                                                            // Usamos la lógica completa que mapea los estados
-                                                            color={
-                                                                turno.estado === 'realizado' ? 'success' :
-                                                                    turno.estado === 'cancelado' ? 'error' :
-                                                                        turno.estado === 'en proceso' ? 'info' :
-                                                                            'warning'
-                                                            }
-                                                        />
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
+                                          .filter((t: Turno) => t.estado !== 'cancelado') // Muestra solo los no cancelados
+                                          .map((turno) => (
+                                            <TableRow key={turno.id_turno}>
+                                                <TableCell>{new Date(turno.fecha_hora).toLocaleDateString()}</TableCell>
+                                                <TableCell>{turno.cliente.nombre} {turno.cliente.apellido}</TableCell>
+                                                <TableCell>{turno.servicio.nombre}</TableCell>
+                                                <TableCell align="right">${Number(turno.servicio.precio).toFixed(2)}</TableCell>
+                                                <TableCell>
+                                                    <Chip 
+                                                        label={turno.estado.toUpperCase()} 
+                                                        size="small" 
+                                                        // 🟢 USAMOS LA FUNCIÓN DE COLOR 🟢
+                                                        color={getStatusColor(turno.estado)} 
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
                                         }
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-
+                            
                             {reporte.turnos.filter((t: Turno) => t.estado !== 'cancelado').length === 0 && (
                                 <Alert severity="info" sx={{ mt: 2 }}>No se encontraron turnos activos en el rango seleccionado.</Alert>
                             )}
