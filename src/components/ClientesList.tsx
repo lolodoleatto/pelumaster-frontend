@@ -1,6 +1,6 @@
 import React from 'react';
-import type { Barbero } from '../types/Barbero';
-import { getBarberos, deleteBarbero } from '../api/api'; 
+import type { Cliente } from '../types/Cliente';
+import { getClientes, deleteCliente } from '../api/api'; 
 import { useFetch } from '../hooks/useFetch'; 
 import { 
     Box, CircularProgress, Alert, List, ListItem, ListItemText, Typography, 
@@ -10,24 +10,22 @@ import PersonIcon from '@mui/icons-material/Person';
 import EditIcon from '@mui/icons-material/Edit'; 
 import DeleteIcon from '@mui/icons-material/Delete'; 
 
-interface BarberosListProps {
-    onEdit: (barbero: Barbero) => void; 
+interface ClientesListProps {
+    onEdit: (cliente: Cliente) => void; 
     onRefresh: () => void; 
 }
 
-export default function BarberosList ({ onEdit, onRefresh }: BarberosListProps) {
-    // el refetch del hook se usara para Delete.
-    const { data: barberos, loading, error, refetch } = useFetch<Barbero[]>(getBarberos);
+export default function ClientesList({ onEdit, onRefresh }: ClientesListProps) {
+    const { data: clientes, loading, error, refetch } = useFetch<Cliente[]>(getClientes);
 
-    // logica para manejar la eliminación
+    // Lógica para manejar la eliminación
     const handleDelete = async (id: number, nombre: string) => {
-        if (window.confirm(`¿Estás seguro de ELIMINAR al barbero ${nombre}? Esta acción es irreversible.`)) {
+        if (window.confirm(`¿Estás seguro de ELIMINAR al cliente ${nombre}?`)) {
             try {
-                await deleteBarbero(id);
-                // usamos el refetch del hook para actualizar la lista de forma reactiva
-                refetch(); 
+                await deleteCliente(id);
+                onRefresh(); // Forzar la recarga de la lista
             } catch (e: any) {
-                const msg = e.response?.data?.message || e.message || "Error al eliminar el barbero.";
+                const msg = e.response?.data?.message || e.message || "Error al eliminar el cliente.";
                 alert(`No se pudo eliminar: ${msg}`);
             }
         }
@@ -39,7 +37,7 @@ export default function BarberosList ({ onEdit, onRefresh }: BarberosListProps) 
         return (
             <Box sx={{ ...contentStyle, textAlign: 'center' }}>
                 <CircularProgress color="primary" />
-                <Typography variant="body1" sx={{ mt: 2 }}>Cargando barberos...</Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}>Cargando clientes...</Typography>
             </Box>
         );
     }
@@ -47,7 +45,7 @@ export default function BarberosList ({ onEdit, onRefresh }: BarberosListProps) 
     if (error) {
         return (
             <Box sx={contentStyle}>
-                <Alert severity="error">Error al cargar los barberos. Detalles: {error.message}</Alert>
+                <Alert severity="error">Error al cargar los clientes. Detalles: {error.message}</Alert>
             </Box>
         );
     }
@@ -56,24 +54,24 @@ export default function BarberosList ({ onEdit, onRefresh }: BarberosListProps) 
         <Box sx={contentStyle}>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h5" gutterBottom>
-                    Nuestros Barberos
+                    Clientes Registrados
                 </Typography>
                 
-                {barberos && barberos.length > 0 ? (
+                {clientes && clientes.length > 0 ? (
                     <List>
-                        {barberos.map((barbero) => (
+                        {clientes.map((cliente) => (
                             <ListItem 
-                                key={barbero.id_barbero} 
+                                key={cliente.id_cliente} 
                                 secondaryAction={
                                     <Stack direction="row" spacing={1}>
                                         <Tooltip title="Editar">
-                                            <IconButton onClick={() => onEdit(barbero)} color="primary">
+                                            <IconButton onClick={() => onEdit(cliente)} color="primary">
                                                 <EditIcon />
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Eliminar">
                                             <IconButton 
-                                                onClick={() => handleDelete(barbero.id_barbero, barbero.nombre)} 
+                                                onClick={() => handleDelete(cliente.id_cliente, cliente.nombre)} 
                                                 color="error"
                                             >
                                                 <DeleteIcon />
@@ -85,14 +83,14 @@ export default function BarberosList ({ onEdit, onRefresh }: BarberosListProps) 
                             >
                                 <PersonIcon color="action" sx={{ mr: 2 }} />
                                 <ListItemText
-                                    primary={<Typography variant="h6">{barbero.nombre} {barbero.apellido}</Typography>}
-                                    secondary={`Teléfono: ${barbero.telefono || 'N/A'} | Activo: ${barbero.activo ? 'Sí' : 'No'}`}
+                                    primary={<Typography variant="h6">{cliente.nombre} {cliente.apellido}</Typography>}
+                                    secondary={`Teléfono: ${cliente.telefono || 'N/A'} | Email: ${cliente.email || 'N/A'}`}
                                 />
                             </ListItem>
                         ))}
                     </List>
                 ) : (
-                    <Alert severity="info">No hay barberos registrados en el sistema.</Alert>
+                    <Alert severity="info">No hay clientes registrados en el sistema.</Alert>
                 )}
             </Paper>
         </Box>

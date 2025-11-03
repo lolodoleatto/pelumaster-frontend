@@ -2,23 +2,38 @@ import type { Barbero } from './Barbero';
 import type{ Cliente } from './Cliente';
 import type { Servicio } from './Servicio';
 
-// Reflejando la estructura completa del Turno
-export type EstadoTurno = 'pendiente' | 'confirmado' | 'cancelado';
+export type EstadoTurno = 'pendiente' | 'realizado' | 'cancelado' | 'en proceso';
 
 export interface Turno {
-  id_turno: number; // Clave primaria
-  
-  // Relaciones (se cargan con 'eager: true' o 'relations' en TypeORM)
+  id_turno: number; 
   cliente: Cliente;
   barbero: Barbero;
   servicio: Servicio;
-  
-  fecha_hora: string; // TypeORM devuelve Date como un string ISO
+  fecha_hora: string;
   estado: EstadoTurno;
+}
+
+// DTO para crear un turno
+export interface CreateTurnoDto {
+  fecha_hora: string;
+  clienteId: number;
+  barberoId: number;
+  servicioId: number;
+}
+
+// Define la interface para los parámetros de filtro
+export interface TurnoFilters {
+  barberoId?: number | string;
+  clienteId?: number | string;
+  servicioId?: number | string;
+  estado?: string;
+  fecha?: string; 
 }
 
 export const ESTADOS_TURNO = {
     PENDIENTE: 'pendiente' as EstadoTurno,
-    CONFIRMADO: 'confirmado' as EstadoTurno,
+    REALIZADO: 'realizado' as EstadoTurno,
     CANCELADO: 'cancelado' as EstadoTurno,
+    EN_PROCESO: 'en proceso' as EstadoTurno,
 };
+

@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
-import BarberosList from '../components/BarberosList';
-import BarberoFormModal from '../components/BarberoFormModal';
-import type { Barbero } from '../types/Barbero';
+import ClientesList from '../components/ClientesList';
+import ClienteFormModal from '../components/ClienteFormModal'; 
+import type { Cliente } from '../types/Cliente';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DashboardLayout from '../components/DashboardLayout';
-import { useTheme } from '@mui/material/styles'; 
+import { useTheme } from '@mui/material/styles';
 
-export default function Barberos() {
-    // ACCEDEMOS AL TEMA 
-    const theme = useTheme();
-
+export default function Clientes() {
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedBarbero, setSelectedBarbero] = useState<Barbero | null>(null);
-    const [listKey, setListKey] = useState(0);
+    const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
+    const [listKey, setListKey] = useState(0); // para forzar la recarga de ClientesList
 
     const handleOpenCreate = () => {
-        setSelectedBarbero(null); // modo Creación
+        setSelectedCliente(null); // modo Creación
         setModalOpen(true);
     };
 
-    const handleOpenEdit = (barbero: Barbero) => {
-        setSelectedBarbero(barbero); // modo Edición
+    const handleOpenEdit = (cliente: Cliente) => {
+        setSelectedCliente(cliente); // modo Edición
         setModalOpen(true);
     };
 
@@ -30,20 +27,22 @@ export default function Barberos() {
         setListKey(prev => prev + 1); // forzar recarga de la lista
     };
 
+    const theme = useTheme();
+
     return (
-        <DashboardLayout title="Administración de Barberos">
-
-
+        <DashboardLayout title="Administración de Clientes"> 
+        
             <Box sx={{
-                padding: theme.spacing(3),
+                pt: theme.spacing(3), 
+                pb: theme.spacing(3), 
             }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                    <Typography
-                        variant="h4"
-                        component="h1"
-                        color="primary" 
+                    <Typography 
+                        variant="h4" 
+                        component="h1" 
+                        color="primary"
                     >
-                        Catálogo de Barberos
+                        Catálogo de Clientes
                     </Typography>
                     <Button
                         variant="contained"
@@ -51,24 +50,23 @@ export default function Barberos() {
                         startIcon={<AddIcon />}
                         onClick={handleOpenCreate}
                     >
-                        Agregar Barbero
+                        Agregar Cliente
                     </Button>
                 </Box>
 
-                <BarberosList
+                <ClientesList
                     key={listKey}
                     onEdit={handleOpenEdit}
                     onRefresh={handleSuccess}
-               
                 />
             </Box>
 
-            {/* modal de Crear/Editar */}
-            <BarberoFormModal
+            {/* Modal de Crear/Editar */}
+            <ClienteFormModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
                 onSuccess={handleSuccess}
-                barbero={selectedBarbero}
+                cliente={selectedCliente}
             />
         </DashboardLayout>
     );
