@@ -15,7 +15,7 @@ interface ServiciosListProps {
     onRefresh: () => void;
 }
 
-const ServiciosList: React.FC<ServiciosListProps> = ({ onEdit, onRefresh }) => {
+export default function ServiciosList({ onEdit, onRefresh }: ServiciosListProps) {
     const { data: servicios, loading, error, refetch } = useFetch<Servicio[]>(getServicios);
 
     // Lógica para manejar la eliminación
@@ -85,7 +85,7 @@ const ServiciosList: React.FC<ServiciosListProps> = ({ onEdit, onRefresh }) => {
                                 <ListItemText
                                     primary={<Typography variant="h6">{servicio.nombre}</Typography>}
                                     secondary={
-                                        // 🛑 CAMBIO CLAVE AQUÍ: Usamos parseFloat para convertir el string a number antes de toFixed()
+                                        
                                         `Precio: $${parseFloat(String(servicio.precio)).toFixed(2)} | Duración: ${servicio.duracion_minutos} min | Descripción: ${servicio.descripcion || 'N/A'}`
                                     }
                                 />
@@ -99,5 +99,3 @@ const ServiciosList: React.FC<ServiciosListProps> = ({ onEdit, onRefresh }) => {
         </Box>
     );
 };
-
-export default ServiciosList;

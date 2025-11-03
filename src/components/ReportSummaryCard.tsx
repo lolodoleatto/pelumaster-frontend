@@ -10,7 +10,7 @@ interface ReportSummaryCardProps {
   subText?: string;
 }
 
-const ReportSummaryCard: React.FC<ReportSummaryCardProps> = ({ title, metric, icon, color, subText }) => {
+export default function ReportSummaryCard({ title, metric, icon, color, subText }: ReportSummaryCardProps) {
   return (
     <Card elevation={3} sx={{ minWidth: 275, borderLeft: `5px solid ${color}` }}>
       <CardContent>
@@ -45,5 +45,3 @@ const ReportSummaryCard: React.FC<ReportSummaryCardProps> = ({ title, metric, ic
     </Card>
   );
 }
-
-export default ReportSummaryCard;

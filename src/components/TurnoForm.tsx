@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useFetch } from '../hooks/useFetch';
-import { createTurno, getBarberos, getClientes, getServicios, type CreateTurnoDto } from '../api/api';
+import { createTurno, getBarberos, getClientes, getServicios} from '../api/api';
 import type { Barbero } from '../types/Barbero';
 import type { Cliente } from '../types/Cliente';
 import type { Servicio } from '../types/Servicio';
+import type { CreateTurnoDto } from '../types/Turno';
 import { 
   Button, 
   TextField, 
@@ -25,7 +26,7 @@ interface TurnoFormProps {
   onClose: () => void;
 }
 
-const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
+export default function TurnoForm({ onSuccess, onClose }: TurnoFormProps) {
   const [formData, setFormData] = useState<Omit<CreateTurnoDto, 'fecha_hora'> & { date: string, time: string }>({
     clienteId: 0,
     barberoId: 0,
@@ -37,14 +38,14 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Carga de datos con errores tipados (AxiosError | null)
+  // carga de datos con errores tipados (AxiosError | null)
   const { data: barberos, loading: loadingBarberos, error: errorBarberos } = useFetch<Barbero[]>(getBarberos);
   const { data: clientes, loading: loadingClientes, error: errorClientes } = useFetch<Cliente[]>(getClientes);
   const { data: servicios, loading: loadingServicios, error: errorServicios } = useFetch<Servicio[]>(getServicios);
 
   // --- HANDLERS DE CAMBIO ---
   
-  // Manejador para Selects y TextFields
+  // manejador para Selects y TextFields
   const handleChange = (e: SelectChangeEvent<number> | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const isIdField = name === 'barberoId' || name === 'servicioId';
@@ -57,7 +58,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
     setSubmitError(null);
   };
   
-  // Manejador específico para el Autocomplete de Cliente
+  // manejador específico para el Autocomplete de Cliente
   const handleClienteChange = (event: React.SyntheticEvent, value: Cliente | null) => {
     const clienteId = value ? value.id_cliente : 0;
     setFormData(prev => ({
@@ -100,10 +101,10 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
     }
   };
 
-  // 🛑 LÓGICA DE CARGA Y ERROR CORREGIDA 🛑
+  //  LÓGICA DE CARGA Y ERROR CORREGIDA 
   const loadingData = loadingBarberos || loadingClientes || loadingServicios;
   
-  // 🛑 CORRECCIÓN: Chequeamos los errores individualmente 🛑
+  // Chequeamos los errores individualmente 
   const fetchError = errorBarberos || errorClientes || errorServicios;
 
 
@@ -115,7 +116,7 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
     );
   }
 
-  // 🛑 CORRECCIÓN: Usamos la variable 'fetchError' 🛑
+  // Usamos la variable 'fetchError' para mostrar el error si existe
   if (fetchError) {
     return <Alert severity="error">Error al cargar datos para el formulario: {fetchError.message}</Alert>;
   }
@@ -243,5 +244,3 @@ const TurnoForm: React.FC<TurnoFormProps> = ({ onSuccess, onClose }) => {
     </Box>
   );
 };
-
-export default TurnoForm;

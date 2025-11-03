@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import TurnosList from '../components/TurnosList';
 import TurnoForm from '../components/TurnoForm';
 import DashboardLayout from '../components/DashboardLayout';
-import { getBarberos, getClientes, getServicios, type TurnoFilters } from '../api/api';
+import { getBarberos, getClientes, getServicios} from '../api/api';
 import { useFetch } from '../hooks/useFetch';
-import { ESTADOS_TURNO } from '../types/Turno';
+import { ESTADOS_TURNO, type TurnoFilters } from '../types/Turno';
 import {
     Typography, Button, Box, Modal, Select, MenuItem, FormControl, InputLabel, TextField, type SelectChangeEvent, CircularProgress, useTheme,
-    Autocomplete // Autocomplete para la búsqueda de clientes
+    Autocomplete 
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import type { Cliente } from '../types/Cliente'; // Importar Cliente
+import type { Cliente } from '../types/Cliente'; 
 
-const Turnos: React.FC = () => {
-    const theme = useTheme(); 
+export default function Turnos() {
+    const theme = useTheme();
     const [openForm, setOpenForm] = useState(false);
     const [listKey, setListKey] = useState(0); // Para forzar el refetch
 
@@ -29,7 +29,6 @@ const Turnos: React.FC = () => {
     const { data: clientes, loading: loadingClientes } = useFetch(getClientes);
     const { data: servicios, loading: loadingServicios } = useFetch(getServicios);
 
-    // Manejador UNIFICADO para Select y TextField (no-Autocomplete)
     const handleFilterChange = (e: SelectChangeEvent<any> | React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFilters(prev => ({
@@ -38,8 +37,7 @@ const Turnos: React.FC = () => {
         }));
         setListKey(prev => prev + 1);
     };
-    
-    // Manejador ESPECÍFICO para el Autocomplete de Cliente
+
     const handleClienteFilterChange = (event: React.SyntheticEvent, value: Cliente | null) => {
         const clienteId = value ? value.id_cliente : 0;
         setFilters(prev => ({
@@ -51,10 +49,10 @@ const Turnos: React.FC = () => {
 
     const handleSuccess = () => {
         setOpenForm(false);
-        setListKey(prev => prev + 1); // Forzar recarga de la lista tras crear un turno
+        setListKey(prev => prev + 1); // forzar recarga de la lista tras crear un turno
     };
-    
-    // Buscar el objeto cliente actualmente seleccionado para Autocomplete
+
+    // buscar el objeto cliente actualmente seleccionado para autocomplete
     const selectedClienteFilter = clientes?.find(c => c.id_cliente === filters.clienteId) || null;
 
 
@@ -71,13 +69,30 @@ const Turnos: React.FC = () => {
 
     return (
         <DashboardLayout title="Gestión de Turnos">
-            
-            <Box sx={{ padding: theme.spacing(3) }}> 
+
+
+            <Box
+                sx={{
+                    mt: 2,
+                    textAlign: 'center',
+                    maxWidth: 900,
+                    mx: 'auto' // Centra el contenido en pantallas grandes
+                }}
+            >
+                <Typography variant="h2" component="h1" gutterBottom color="primary">
+                    Bienvenido a PeluMaster
+                </Typography>
+                <Typography variant="h5" component="p" color="text.secondary" sx={{ mb: 4 }}>
+                    Tu sistema integral para la gestión de turnos y barberos.
+                </Typography>
+            </Box>
+
+            <Box sx={{ padding: theme.spacing(3) }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                    <Typography 
-                        variant="h4" 
-                        component="h1" 
-                        color="primary" 
+                    <Typography
+                        variant="h4"
+                        component="h1"
+                        color="primary"
                     >
                         Turnos Agendados
                     </Typography>
@@ -91,20 +106,20 @@ const Turnos: React.FC = () => {
                     </Button>
                 </Box>
 
-                {/* 🛑 BARRA DE FILTROS 🛑 */}
-                <Box 
-                    sx={{ 
-                        display: 'flex', 
-                        gap: 2, 
-                        mb: 4, 
-                        flexWrap: 'wrap', 
-                        p: 2, 
-                        bgcolor: theme.palette.background.paper, 
-                        borderRadius: 1 
+                {/*  BARRA DE FILTROS  */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 2,
+                        mb: 4,
+                        flexWrap: 'wrap',
+                        p: 2,
+                        bgcolor: theme.palette.background.paper,
+                        borderRadius: 1
                     }}
                 >
                     {/* Filtro por Barbero (SELECT) */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> {/* 🛑 size="small" */}
+                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small">
                         <InputLabel>Barbero</InputLabel>
                         <Select
                             name="barberoId"
@@ -130,10 +145,10 @@ const Turnos: React.FC = () => {
                             onChange={handleClienteFilterChange}
                             isOptionEqualToValue={(option, value) => option.id_cliente === value.id_cliente}
                             renderInput={(params) => (
-                                <TextField 
-                                    {...params} 
-                                    label="Buscar Cliente" 
-                                    size="small" // 🛑 size="small"
+                                <TextField
+                                    {...params}
+                                    label="Buscar Cliente"
+                                    size="small" 
                                 />
                             )}
                             clearText="Limpiar"
@@ -142,7 +157,7 @@ const Turnos: React.FC = () => {
                     </Box>
 
                     {/* Filtro por Servicio (SELECT) */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> {/* 🛑 size="small" */}
+                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> 
                         <InputLabel>Servicio</InputLabel>
                         <Select
                             name="servicioId"
@@ -160,7 +175,7 @@ const Turnos: React.FC = () => {
                     </FormControl>
 
                     {/* Filtro por Estado (SELECT) */}
-                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> {/* 🛑 size="small" */}
+                    <FormControl sx={{ minWidth: 150, flexGrow: 1 }} size="small"> 
                         <InputLabel>Estado</InputLabel>
                         <Select
                             name="estado"
@@ -176,21 +191,21 @@ const Turnos: React.FC = () => {
                             ))}
                         </Select>
                     </FormControl>
-                    
+
                     {/* Filtro por Fecha (TEXTFIELD) */}
                     <TextField
-                        sx={{ minWidth: 150, flexGrow: 1 }} 
+                        sx={{ minWidth: 150, flexGrow: 1 }}
                         name="fecha"
                         label="Fecha Específica"
                         type="date"
                         value={filters.fecha}
                         onChange={handleFilterChange}
                         InputLabelProps={{ shrink: true }}
-                        size="small" // 🛑 size="small"
+                        size="small" 
                     />
 
                 </Box>
-                {/* 🛑 FIN BARRA DE FILTROS 🛑 */}
+                {/* FIN BARRA DE FILTROS */}
 
                 <TurnosList key={listKey} filters={filters} />
 
@@ -202,8 +217,8 @@ const Turnos: React.FC = () => {
                 >
                     <Box sx={{
                         position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                        width: { xs: '90%', md: 600 }, 
-                        bgcolor: theme.palette.background.paper, 
+                        width: { xs: '90%', md: 600 },
+                        bgcolor: theme.palette.background.paper,
                         boxShadow: 24, p: 4, borderRadius: 2
                     }}>
                         <Typography id="modal-title" variant="h5" component="h2" mb={3}>
@@ -215,10 +230,8 @@ const Turnos: React.FC = () => {
                         />
                     </Box>
                 </Modal>
-                
+
             </Box>
         </DashboardLayout>
     );
 };
-
-export default Turnos;

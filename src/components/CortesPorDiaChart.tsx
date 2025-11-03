@@ -8,33 +8,29 @@ interface CortesPorDiaChartProps {
     barberoNombre: string;
 }
 
-// 🟢 FUNCIÓN AUXILIAR CORREGIDA: SUMA 24 HORAS PARA CORREGIR EL DESFASE 🟢
+// SUMA 24 HORAS PARA CORREGIR EL DESFASE
 const procesarDatosParaGrafico = (turnos: Turno[]) => {
     const cortesPorDia: { [key: string]: number } = {};
 
-    // 1. Contar cortes por día
+    // Contar cortes por día
     turnos.forEach(turno => {
         if (turno.estado === 'cancelado') {
             return; 
         }
-
         const fechaOriginal = new Date(turno.fecha_hora);
         
-        // 🛑 CORRECCIÓN: Sumamos 24 horas (86,400,000 milisegundos) 
+        // sumamos 24 horas (86,400,000 milisegundos) 
         // para compensar el ajuste de zona horaria (UTC medianoche -> Local)
         const fechaCorregida = new Date(fechaOriginal.getTime() + 86400000); 
 
-        // 🛑 Usamos toISOString para obtener la fecha YYYY-MM-DD del día corregido
         const fechaKey = fechaCorregida.toISOString().split('T')[0];
         
         cortesPorDia[fechaKey] = (cortesPorDia[fechaKey] || 0) + 1;
     });
 
-    // 2. Preparar el array final ordenado
     const fechasOrdenadas = Object.keys(cortesPorDia).sort();
 
     const dataFinal = {
-        // Creamos los objetos Date con la clave YYYY-MM-DD
         fechas: fechasOrdenadas.map(dateStr => new Date(dateStr)), 
         cantidades: fechasOrdenadas.map(fechaKey => cortesPorDia[fechaKey]),
     };
@@ -42,7 +38,7 @@ const procesarDatosParaGrafico = (turnos: Turno[]) => {
     return dataFinal;
 };
 
-const CortesPorDiaChart: React.FC<CortesPorDiaChartProps> = ({ turnos, barberoNombre }) => {
+export default function CortesPorDiaChart({ turnos, barberoNombre }: CortesPorDiaChartProps) {
     const { fechas, cantidades } = procesarDatosParaGrafico(turnos);
 
     if (fechas.length === 0) {
@@ -90,5 +86,3 @@ const CortesPorDiaChart: React.FC<CortesPorDiaChartProps> = ({ turnos, barberoNo
         </Paper>
     );
 };
-
-export default CortesPorDiaChart;

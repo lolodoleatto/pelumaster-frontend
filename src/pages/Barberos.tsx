@@ -5,10 +5,10 @@ import type { Barbero } from '../types/Barbero';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DashboardLayout from '../components/DashboardLayout';
-import { useTheme } from '@mui/material/styles'; // 🛑 Importamos useTheme para usar el espaciado y colores
+import { useTheme } from '@mui/material/styles'; 
 
-const Barberos: React.FC = () => {
-    // 🛑 ACCEDEMOS AL TEMA 🛑
+export default function Barberos() {
+    // ACCEDEMOS AL TEMA 
     const theme = useTheme();
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -16,33 +16,32 @@ const Barberos: React.FC = () => {
     const [listKey, setListKey] = useState(0);
 
     const handleOpenCreate = () => {
-        setSelectedBarbero(null); // Modo Creación
+        setSelectedBarbero(null); // modo Creación
         setModalOpen(true);
     };
 
     const handleOpenEdit = (barbero: Barbero) => {
-        setSelectedBarbero(barbero); // Modo Edición
+        setSelectedBarbero(barbero); // modo Edición
         setModalOpen(true);
     };
 
     const handleSuccess = () => {
         setModalOpen(false);
-        setListKey(prev => prev + 1); // Forzar recarga de la lista
+        setListKey(prev => prev + 1); // forzar recarga de la lista
     };
 
     return (
-        <DashboardLayout title="Administración de Barberos"> {/* 🛑 Título Ajustado 🛑 */}
+        <DashboardLayout title="Administración de Barberos">
 
-            {/* 🛑 ELIMINAMOS ESTILOS FIJOS (bgcolor, minHeight) y el Fragment vacío (<> </>) 🛑 */}
+
             <Box sx={{
-                // Usamos el spacing del tema para el padding superior e inferior
                 padding: theme.spacing(3),
             }}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography
                         variant="h4"
                         component="h1"
-                        color="primary" // Usamos el color primario del tema (Celeste)
+                        color="primary" 
                     >
                         Catálogo de Barberos
                     </Typography>
@@ -60,11 +59,11 @@ const Barberos: React.FC = () => {
                     key={listKey}
                     onEdit={handleOpenEdit}
                     onRefresh={handleSuccess}
-                // No es necesario onRefresh si usas onEdit, pero lo mantendremos para consistencia
+               
                 />
             </Box>
 
-            {/* Modal de Crear/Editar */}
+            {/* modal de Crear/Editar */}
             <BarberoFormModal
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
@@ -74,5 +73,3 @@ const Barberos: React.FC = () => {
         </DashboardLayout>
     );
 };
-
-export default Barberos;

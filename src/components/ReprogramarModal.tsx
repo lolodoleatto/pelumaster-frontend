@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Box, Typography, Button, TextField, Alert, CircularProgress } from '@mui/material';
 import type { Turno } from '../types/Turno';
 import { reprogramarTurno } from '../api/api';
 import UpdateIcon from '@mui/icons-material/Update';
 
-// Estilos básicos para centrar el modal
+// estilos del modal
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -19,17 +19,16 @@ const style = {
 
 interface ReprogramarModalProps {
     open: boolean;
-    turno: Turno; // El turno que se va a modificar
+    turno: Turno; 
     onClose: () => void;
-    onSuccess: () => void; // Para recargar la lista de turnos en el padre
+    onSuccess: () => void; 
 }
 
-const ReprogramarModal: React.FC<ReprogramarModalProps> = ({ open, turno, onClose, onSuccess }) => {
+export default function ReprogramarModal({ open, turno, onClose, onSuccess }: ReprogramarModalProps) {
 
     // Función para obtener la fecha y hora inicial en formato HTML (YYYY-MM-DD y HH:MM)
     const getInitialDateTime = (isoString: string) => {
         const date = new Date(isoString);
-        // Offset local para evitar problemas de zona horaria al formatear
         const localIso = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
         return {
             dateStr: localIso.substring(0, 10), // YYYY-MM-DD
@@ -44,14 +43,13 @@ const ReprogramarModal: React.FC<ReprogramarModalProps> = ({ open, turno, onClos
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // 🟢 SOLUCIÓN: Sincronizar el estado interno con las props
-    React.useEffect(() => {
-        // Re-ejecutar si el ID del turno cambia
+
+    useEffect(() => {
         const updatedDateTime = getInitialDateTime(turno.fecha_hora);
         setNewDate(updatedDateTime.dateStr);
         setNewTime(updatedDateTime.timeStr);
-        setError(null); // Limpiar errores al cambiar de turno
-    }, [turno.id_turno, turno.fecha_hora]); // Depende del turno actual
+        setError(null); 
+    }, [turno.id_turno, turno.fecha_hora]); 
 
     const handleSubmit = async () => {
         // Validación básica
@@ -67,7 +65,7 @@ const ReprogramarModal: React.FC<ReprogramarModalProps> = ({ open, turno, onClos
 
             onSuccess(); // Recarga la lista en el componente padre
         } catch (err: any) {
-            // Capturamos el mensaje de error de conflicto del backend
+            // capturamos el mensaje de error de conflicto del backend
             const msg = err.response?.data?.mensaje
                 || err.response?.data?.message
                 || "Error al reprogramar el turno. Verifique que el horario esté libre.";
@@ -123,5 +121,3 @@ const ReprogramarModal: React.FC<ReprogramarModalProps> = ({ open, turno, onClos
         </Modal>
     );
 };
-
-export default ReprogramarModal;

@@ -11,20 +11,20 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete'; 
 
 interface BarberosListProps {
-    onEdit: (barbero: Barbero) => void; // Función pasada desde la página (Barberos.tsx)
-    onRefresh: () => void; // Función para recargar la lista después de eliminar
+    onEdit: (barbero: Barbero) => void; 
+    onRefresh: () => void; 
 }
 
-const BarberosList: React.FC<BarberosListProps> = ({ onEdit, onRefresh }) => {
-    // El refetch del hook se usará internamente para Delete.
+export default function BarberosList ({ onEdit, onRefresh }: BarberosListProps) {
+    // el refetch del hook se usara para Delete.
     const { data: barberos, loading, error, refetch } = useFetch<Barbero[]>(getBarberos);
 
-    // Lógica para manejar la eliminación
+    // logica para manejar la eliminación
     const handleDelete = async (id: number, nombre: string) => {
         if (window.confirm(`¿Estás seguro de ELIMINAR al barbero ${nombre}? Esta acción es irreversible.`)) {
             try {
                 await deleteBarbero(id);
-                // Usamos el refetch del hook para actualizar la lista de forma reactiva
+                // usamos el refetch del hook para actualizar la lista de forma reactiva
                 refetch(); 
             } catch (e: any) {
                 const msg = e.response?.data?.message || e.message || "Error al eliminar el barbero.";
@@ -67,7 +67,6 @@ const BarberosList: React.FC<BarberosListProps> = ({ onEdit, onRefresh }) => {
                                 secondaryAction={
                                     <Stack direction="row" spacing={1}>
                                         <Tooltip title="Editar">
-                                            {/* 🛑 Llama a la prop onEdit que abre el modal 🛑 */}
                                             <IconButton onClick={() => onEdit(barbero)} color="primary">
                                                 <EditIcon />
                                             </IconButton>
@@ -99,5 +98,3 @@ const BarberosList: React.FC<BarberosListProps> = ({ onEdit, onRefresh }) => {
         </Box>
     );
 };
-
-export default BarberosList;

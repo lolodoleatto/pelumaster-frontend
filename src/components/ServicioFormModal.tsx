@@ -10,9 +10,10 @@ interface ServicioFormModalProps {
     open: boolean;
     onClose: () => void;
     onSuccess: () => void;
-    servicio: Servicio | null; // Null para CREAR, objeto para EDITAR
+    servicio: Servicio | null;
 }
 
+// estilo del modal
 const modalStyle = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -25,7 +26,7 @@ const modalStyle = {
     borderRadius: 2,
 };
 
-// Tipo para el estado del formulario (usa string para inputs de number)
+// tipo para el estado del formulario (usa string para inputs de number)
 type FormState = Omit<CreateServicioDto, 'precio' | 'duracion_minutos'> & { 
     precio: string; 
     duracion_minutos: string; 
@@ -34,7 +35,7 @@ type FormState = Omit<CreateServicioDto, 'precio' | 'duracion_minutos'> & {
 
 const INITIAL_FORM_DATA = { nombre: '', precio: '', duracion_minutos: '', descripcion: '' };
 
-const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, onSuccess, servicio }) => {
+export default function ServicioFormModal({ open, onClose, onSuccess, servicio }: ServicioFormModalProps) {
     const isEdit = !!servicio;
     
     const [formData, setFormData] = useState<FormState>({
@@ -107,7 +108,7 @@ const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, on
             } else {
                 // Modo CREACIÓN
                 await createServicio(dataToSubmit);
-                resetForm();    // Limpiar el formulario tras crear un nuevo servicio
+                resetForm();    // limpiar el formulario tras crear un nuevo servicio
             }
             
             onSuccess();
@@ -132,10 +133,8 @@ const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, on
                     required disabled={isSubmitting}
                 />
                 
-                {/* 🛑 USAMOS BOX CON FLEXBOX PARA ALINEAR LOS CAMPOS (Duración y Precio) 🛑 */}
                 <Box sx={{ display: 'flex', gap: 2, '& > *': { flexGrow: 1 } }}>
                     <TextField
-                        // Sin fullWidth aquí para que Box lo maneje
                         margin="normal" label="Duración (minutos)"
                         name="duracion_minutos" value={formData.duracion_minutos} onChange={handleChange}
                         type="number" required disabled={isSubmitting}
@@ -175,5 +174,3 @@ const ServicioFormModal: React.FC<ServicioFormModalProps> = ({ open, onClose, on
         </Modal>
     );
 };
-
-export default ServicioFormModal;

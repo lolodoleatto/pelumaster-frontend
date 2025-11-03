@@ -1,12 +1,12 @@
 export interface Servicio {
-  id_servicio: number; // Clave primaria
+  id_servicio: number; 
   nombre: string;
   duracion_minutos: number;
-  precio: number; // TypeORM lo devuelve como number (string si usas PostgreSQL)
+  precio: number; 
   descripcion: string | null;
 }
 
-// DTO para Crear un nuevo Servicio (POST)
+// DTO para crear un nuevo Servicio (POST)
 export interface CreateServicioDto {
   nombre: string;
   duracion_minutos: number;
@@ -14,7 +14,7 @@ export interface CreateServicioDto {
   descripcion?: string;
 }
 
-// DTO para Actualizar un Servicio (PATCH)
+// DTO para actualizar un Servicio (PATCH)
 export interface UpdateServicioDto {
   nombre?: string;
   duracion_minutos?: number;

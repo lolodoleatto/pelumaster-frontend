@@ -15,7 +15,7 @@ interface ClientesListProps {
     onRefresh: () => void; 
 }
 
-const ClientesList: React.FC<ClientesListProps> = ({ onEdit, onRefresh }) => {
+export default function ClientesList({ onEdit, onRefresh }: ClientesListProps) {
     const { data: clientes, loading, error, refetch } = useFetch<Cliente[]>(getClientes);
 
     // Lógica para manejar la eliminación
@@ -96,5 +96,3 @@ const ClientesList: React.FC<ClientesListProps> = ({ onEdit, onRefresh }) => {
         </Box>
     );
 };
-
-export default ClientesList;

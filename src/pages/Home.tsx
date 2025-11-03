@@ -1,14 +1,12 @@
-import React from 'react';
+/**
+ * import React from 'react';
 import { Typography, Box } from '@mui/material';
 import DashboardLayout from '../components/DashboardLayout';
 
 const Home: React.FC = () => {
   return (
-    <DashboardLayout title="Dashboard Principal"> {/* 1. Usar título más claro */}
+    <DashboardLayout title="Dashboard Principal">       
 
-      {/* 🛑 2. ELIMINAMOS EL CONTENEDOR REDUNDANTE (Container maxWidth="md") 🛑 */}
-      
-      {/* Usamos Box para centrar el contenido dentro del DashboardLayout */}
       <Box 
         sx={{ 
           mt: 2, 
@@ -18,7 +16,7 @@ const Home: React.FC = () => {
         }}
       >
         <Typography variant="h2" component="h1" gutterBottom color="primary">
-          Bienvenido a PeluMaster ✂️
+          Bienvenido a PeluMaster
         </Typography>
         <Typography variant="h5" component="p" color="text.secondary" sx={{ mb: 4 }}>
           Tu sistema integral para la gestión de turnos y barberos.
@@ -38,3 +36,4 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+*/

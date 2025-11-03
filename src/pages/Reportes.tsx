@@ -1,42 +1,39 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import ReportSummaryCard from '../components/ReportSummaryCard';
-import CortesPorDiaChart from '../components/CortesPorDiaChart'; 
+import CortesPorDiaChart from '../components/CortesPorDiaChart';
 import { useFetch } from '../hooks/useFetch';
 import { getBarberos, getReporteBarbero, type ReporteBarbero } from '../api/api';
 import type { Barbero } from '../types/Barbero';
-import { type Turno, ESTADOS_TURNO } from '../types/Turno'; 
-
+import { type Turno, ESTADOS_TURNO } from '../types/Turno';
 import {
-    Container, Paper, Typography, Box, CircularProgress, Alert, 
-    FormControl, InputLabel, Select, MenuItem, Button, TextField, Stack, 
+    Container, Paper, Typography, Box, CircularProgress, Alert,
+    FormControl, InputLabel, Select, MenuItem, Button, TextField, Stack,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, useTheme
 } from '@mui/material';
-
-// Importación de Íconos
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 
-// 🟢 FUNCIÓN CENTRALIZADA PARA EL COLOR DEL CHIP 🟢
+// FUNCIÓN PARA EL COLOR DEL CHIP 
 const getStatusColor = (estado: string): 'default' | 'primary' | 'secondary' | 'error' | 'success' | 'warning' | 'info' => {
     switch (estado) {
         case ESTADOS_TURNO.REALIZADO:
-            return 'success'; 
+            return 'success';
         case ESTADOS_TURNO.CANCELADO:
-            return 'error'; 
+            return 'error';
         case ESTADOS_TURNO.EN_PROCESO:
-            return 'info'; 
+            return 'info';
         case ESTADOS_TURNO.PENDIENTE:
-            return 'warning'; 
+            return 'warning';
         default:
             return 'default';
     }
 };
 
-const Reportes: React.FC = () => {
-    const theme = useTheme(); 
-    
-    // 🛑 ESTADOS 🛑
+export default function Reportes() {
+    const theme = useTheme();
+
+    // ESTADOS 
     const [barberoId, setBarberoId] = useState<number>(0);
     const [fechaDesde, setFechaDesde] = useState('');
     const [fechaHasta, setFechaHasta] = useState('');
@@ -44,7 +41,7 @@ const Reportes: React.FC = () => {
     const [loadingReporte, setLoadingReporte] = useState(false);
     const [errorReporte, setErrorReporte] = useState<string | null>(null);
 
-    // Carga la lista de barberos
+    // carga la lista de barberos
     const { data: barberos, loading: loadingBarberos, error: errorBarberos } = useFetch<Barbero[]>(getBarberos);
 
     const generarReporte = async (e: React.FormEvent) => {
@@ -89,21 +86,37 @@ const Reportes: React.FC = () => {
         );
     }
 
-    // 🛑 CONTENIDO PRINCIPAL 🛑
+    const formatNumberAR = (num: number | string | null | undefined): string => {
+        if (num === null || num === undefined) {
+            return '0,00';
+        }
+
+        const numericValue = typeof num === 'string' ? parseFloat(num) : num;
+
+        if (isNaN(numericValue)) {
+            return '0,00';
+        }
+
+        return new Intl.NumberFormat('es-AR', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+        }).format(numericValue);
+    };
+
     return (
         <DashboardLayout title="Reportes y Análisis">
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}> 
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
 
                 {/* 1. SECCIÓN DE FILTROS */}
                 <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
                     <Box component="form" onSubmit={generarReporte}>
-                        <Stack 
-                            direction={{ xs: 'column', sm: 'row' }} 
-                            spacing={2} 
+                        <Stack
+                            direction={{ xs: 'column', sm: 'row' }}
+                            spacing={2}
                             alignItems={{ xs: 'stretch', sm: 'center' }}
                         >
                             {/* Selector de Barbero */}
-                            <Box sx={{ flex: '0 0 30%' }}> 
+                            <Box sx={{ flex: '0 0 30%' }}>
                                 <FormControl fullWidth required>
                                     <InputLabel id="barbero-select-label">Seleccionar Barbero</InputLabel>
                                     <Select
@@ -145,13 +158,13 @@ const Reportes: React.FC = () => {
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </Box>
-                            
+
                             {/* Botón de Generar */}
                             <Box sx={{ flex: '0 0 15%' }}>
-                                <Button 
-                                    type="submit" 
-                                    variant="contained" 
-                                    color="primary" 
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
                                     fullWidth
                                     disabled={barberoId === 0 || loadingReporte}
                                     sx={{ height: '56px' }}
@@ -164,68 +177,68 @@ const Reportes: React.FC = () => {
                 </Paper>
 
                 {/* ================================================== */}
-                {/* 2. VISTA DE RESULTADOS */}
+                {/* VISTA DE RESULTADOS */}
                 {/* ================================================== */}
 
                 {errorReporte && <Alert severity="error" sx={{ mb: 2 }}>{errorReporte}</Alert>}
 
                 {reporte && (
-                    <React.Fragment>
-                        
+                    <>
+
                         {
-                            // 🟢 Lógica de cálculo (Cards)
                             (() => {
                                 const turnosActivos = reporte.turnos.filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO);
-                                
+
                                 const gananciaBruta = turnosActivos.reduce((sum, turno) => {
-                                    return sum + (parseFloat(String(turno.servicio.precio)) || 0); 
+                                    return sum + (parseFloat(String(turno.servicio.precio)) || 0);
                                 }, 0);
 
-                                const turnosRealizadosCount = reporte.turnos.filter((t: Turno) => t.estado === ESTADOS_TURNO.REALIZADO ).length;
+                                const turnosRealizadosCount = reporte.turnos.filter((t: Turno) => t.estado === ESTADOS_TURNO.REALIZADO).length;
+
+                                const gananciaEnPesos = formatNumberAR(gananciaBruta);
 
                                 return (
-                                    <React.Fragment>
-                                        {/* 🛑 FILA 1: TARJETAS DE MÉTRICAS (FLEX ROW) 🛑 */}
-                                        <Box 
-                                            sx={{ 
-                                                display: 'flex', 
-                                                flexWrap: 'wrap', 
-                                                gap: 3, 
-                                                mb: 4 
+                                    <>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                gap: 3,
+                                                mb: 4
                                             }}
-                                        > 
+                                        >
                                             {/* Card 1: Total de Turnos */}
-                                            <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}> 
-                                                <ReportSummaryCard 
+                                            <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
+                                                <ReportSummaryCard
                                                     title="TOTAL DE TURNOS (Activos)"
                                                     metric={turnosActivos.length}
                                                     icon={<EventAvailableIcon />}
-                                                    color={theme.palette.info.main} 
+                                                    color={theme.palette.info.main}
                                                     subText={`Turnos realizados: ${turnosRealizadosCount}`}
                                                 />
                                             </Box>
 
                                             {/* Card 2: Ganancia Total */}
                                             <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
-                                                <ReportSummaryCard 
+                                                <ReportSummaryCard
                                                     title="VALOR BRUTO DE TURNOS"
-                                                    metric={`$${gananciaBruta.toFixed(2)}`}
+                                                    metric={`$${gananciaEnPesos}`}
                                                     icon={<AttachMoneyIcon />}
-                                                    color={theme.palette.success.main} 
+                                                    color={theme.palette.success.main}
                                                     subText={`Barbero: ${barberoSeleccionado?.nombre || 'N/A'}`}
                                                 />
                                             </Box>
                                         </Box>
-                                        
-                                        {/* 🛑 FILA 2: GRÁFICO (100% ANCHO) 🛑 */}
-                                        <Box sx={{ width: '100%', mb: 4 }}> 
-                                            <CortesPorDiaChart 
-                                                turnos={reporte.turnos} 
+
+                                        {/* FILA 2: GRÁFICO (100% ANCHO) */}
+                                        <Box sx={{ width: '100%', mb: 4 }}>
+                                            <CortesPorDiaChart
+                                                turnos={reporte.turnos}
                                                 barberoNombre={barberoSeleccionado?.nombre || 'General'}
                                             />
                                         </Box>
-                                        
-                                    </React.Fragment>
+
+                                    </>
                                 );
                             })()
                         }
@@ -235,7 +248,7 @@ const Reportes: React.FC = () => {
                             <Typography variant="h5" gutterBottom>
                                 Detalle de Turnos
                             </Typography>
-                            
+
                             <TableContainer component={Paper} variant="outlined">
                                 <Table size="small">
                                     <TableHead>
@@ -249,18 +262,22 @@ const Reportes: React.FC = () => {
                                     </TableHead>
                                     <TableBody>
                                         {reporte.turnos
-                                            .filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO) 
+                                            .filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO)
                                             .map((turno) => (
                                                 <TableRow key={turno.id_turno}>
                                                     <TableCell>{new Date(turno.fecha_hora).toLocaleDateString()}</TableCell>
                                                     <TableCell>{turno.cliente.nombre} {turno.cliente.apellido}</TableCell>
                                                     <TableCell>{turno.servicio.nombre}</TableCell>
-                                                    <TableCell align="right">${parseFloat(String(turno.servicio.precio)).toFixed(2)}</TableCell>
+                                                    <TableCell align="right">{Intl.NumberFormat('es-AR', {
+                                                        style: 'currency',
+                                                        currency: 'ARS', // Código de moneda para Pesos Argentinos
+                                                        minimumFractionDigits: 2,
+                                                    }).format(turno.servicio.precio)}</TableCell>
                                                     <TableCell>
-                                                        <Chip 
-                                                            label={turno.estado.toUpperCase()} 
-                                                            size="small" 
-                                                            color={getStatusColor(turno.estado)} 
+                                                        <Chip
+                                                            label={turno.estado.toUpperCase()}
+                                                            size="small"
+                                                            color={getStatusColor(turno.estado)}
                                                         />
                                                     </TableCell>
                                                 </TableRow>
@@ -269,16 +286,14 @@ const Reportes: React.FC = () => {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
-                            
+
                             {reporte.turnos.filter((t: Turno) => t.estado !== ESTADOS_TURNO.CANCELADO).length === 0 && (
                                 <Alert severity="info" sx={{ mt: 2 }}>No se encontraron turnos activos en el rango seleccionado.</Alert>
                             )}
                         </Paper>
-                    </React.Fragment>
+                    </>
                 )}
             </Container>
         </DashboardLayout>
     );
 };
-
-export default Reportes;

@@ -7,17 +7,25 @@ export interface Barbero {
   activo: boolean;
 }
 
-// DTO para Crear un nuevo Barbero (POST)
+// DTO para crear un nuevo Barbero (POST)
 export interface CreateBarberoDto {
   nombre: string;
   apellido: string;
   telefono: string;
 }
 
-// DTO para Actualizar un Barbero (PATCH)
+// DTO para actualizar un Barbero (PATCH)
 export interface UpdateBarberoDto {
   nombre?: string;
   apellido?: string;
   telefono?: string;
   activo?: boolean;
+}
+
+
+export interface BarberoFormModalProps {
+    open: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+    barbero: Barbero | null; 
 }

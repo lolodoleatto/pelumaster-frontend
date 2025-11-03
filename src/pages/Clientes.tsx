@@ -5,37 +5,34 @@ import type { Cliente } from '../types/Cliente';
 import { Box, Typography, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DashboardLayout from '../components/DashboardLayout';
-import { useTheme } from '@mui/material/styles'; // Importar useTheme si necesitas el espaciado o colores
+import { useTheme } from '@mui/material/styles';
 
-const Clientes: React.FC = () => {
+export default function Clientes() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
-    const [listKey, setListKey] = useState(0); // Para forzar la recarga de ClientesList
+    const [listKey, setListKey] = useState(0); // para forzar la recarga de ClientesList
 
     const handleOpenCreate = () => {
-        setSelectedCliente(null); // Modo Creación
+        setSelectedCliente(null); // modo Creación
         setModalOpen(true);
     };
 
     const handleOpenEdit = (cliente: Cliente) => {
-        setSelectedCliente(cliente); // Modo Edición
+        setSelectedCliente(cliente); // modo Edición
         setModalOpen(true);
     };
 
     const handleSuccess = () => {
         setModalOpen(false);
-        setListKey(prev => prev + 1); // Forzar recarga de la lista
+        setListKey(prev => prev + 1); // forzar recarga de la lista
     };
 
-    // 🛑 ACCEDER AL TEMA (Opcional, pero bueno para el padding) 🛑
     const theme = useTheme();
 
     return (
         <DashboardLayout title="Administración de Clientes"> 
-            
-            {/* 🛑 ELIMINAMOS ESTILOS FIJOS (bgcolor, minHeight, width, color) 🛑 */}
+        
             <Box sx={{
-                // Usamos el spacing del tema para el padding superior e inferior
                 pt: theme.spacing(3), 
                 pb: theme.spacing(3), 
             }}>
@@ -43,7 +40,7 @@ const Clientes: React.FC = () => {
                     <Typography 
                         variant="h4" 
                         component="h1" 
-                        color="primary" // Usar color primario del tema (celeste)
+                        color="primary"
                     >
                         Catálogo de Clientes
                     </Typography>
@@ -61,8 +58,6 @@ const Clientes: React.FC = () => {
                     key={listKey}
                     onEdit={handleOpenEdit}
                     onRefresh={handleSuccess}
-                    // Aquí asumimos que ClientesList usa onEdit y onRefresh 
-                    // Si solo usa onEdit, onRefresh no es necesario en el List, solo en el Modal onSuccess
                 />
             </Box>
 
@@ -76,5 +71,3 @@ const Clientes: React.FC = () => {
         </DashboardLayout>
     );
 };
-
-export default Clientes;

@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import type { Barbero, CreateBarberoDto, UpdateBarberoDto } from '../types/Barbero';
+import type { Barbero, CreateBarberoDto, UpdateBarberoDto, BarberoFormModalProps } from '../types/Barbero';
 import { createBarbero, updateBarbero } from '../api/api';
 import { 
     Modal, Box, TextField, Button, Typography, Alert, CircularProgress, 
     Switch, FormControlLabel, Paper
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
-
-interface BarberoFormModalProps {
-    open: boolean;
-    onClose: () => void;
-    onSuccess: () => void;
-    barbero: Barbero | null; // Null para Crear, Objeto para Editar
-}
 
 const modalStyle = {
     position: 'absolute' as 'absolute',
@@ -28,10 +21,9 @@ const modalStyle = {
 
 const INITIAL_FORM_DATA = { nombre: '', apellido: '', telefono: '', activo: true };
 
-const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSuccess, barbero }) => {
+export default function BarberoFormModal({ open, onClose, onSuccess, barbero }: BarberoFormModalProps){
     const isEdit = !!barbero;
     
-    // 🛑 Usamos un tipo que combina los campos necesarios para el formulario 🛑
     const [formData, setFormData] = useState<CreateBarberoDto & { activo: boolean }>({
         nombre: '', apellido: '', telefono: '', activo: true,
     });
@@ -39,13 +31,12 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    // Función auxiliar para resetear el formulario
     const resetForm = () => {
         setFormData(INITIAL_FORM_DATA);
         setSubmitError(null);
     };
 
-    // 🛑 Lógica para precargar el formulario en modo EDICIÓN 🛑
+    // logica para precargar el formulario en modo EDICIÓN
     useEffect(() => {
         if (barbero) {
             setFormData({
@@ -55,7 +46,6 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
                 activo: barbero.activo,
             });
         } else {
-            // Resetear para modo CREACIÓN
             setFormData(INITIAL_FORM_DATA);
         }
     }, [barbero]);
@@ -95,10 +85,10 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
                 };
                 await createBarbero(createDto);
 
-                resetForm();    // Limpiar el formulario tras crear un nuevo barbero
+                resetForm();
             }
             
-            onSuccess(); // Cierra el modal y refresca la lista
+            onSuccess(); 
         } catch (err: any) {
             const msg = err.response?.data?.message || err.message || "Error al guardar el barbero.";
             setSubmitError(msg);
@@ -165,5 +155,3 @@ const BarberoFormModal: React.FC<BarberoFormModalProps> = ({ open, onClose, onSu
         </Modal>
     );
 };
-
-export default BarberoFormModal;

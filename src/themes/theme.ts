@@ -1,33 +1,32 @@
-// src/theme.ts
 import { createTheme } from '@mui/material/styles';
 
-// Define tus colores personalizados
-// Para el modo oscuro, queremos un fondo oscuro, texto claro y un color primario que resalte.
+// definimos el tema personalizado con modo oscuro
+
 const customTheme = createTheme({
   palette: {
-    mode: 'dark', // 🛑 ESTO ACTIVA EL MODO OSCURO GLOBALMENTE 🛑
+    mode: 'dark',
     primary: {
-      main: '#03A9F4', // Un celeste vibrante para el "good chupete en orto inside"
+      main: '#03A9F4',
       light: '#67daff',
       dark: '#007ac1',
-      contrastText: '#FFFFFF', // Texto blanco sobre el primario
+      contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#9CCC65', // Un verde sutil si necesitas un segundo color de acento (opcional)
+      main: '#9CCC65',
       light: '#cfff95',
       dark: '#6b9b37',
-      contrastText: '#000000', // Texto oscuro sobre el secundario
+      contrastText: '#000000',
     },
     background: {
-      default: '#121212', // Negro muy oscuro
-      paper: '#1E1E1E', // Un gris oscuro ligeramente más claro para tarjetas y paneles
+      default: '#121212',
+      paper: '#1E1E1E',
     },
     text: {
-      primary: '#FFFFFF', // Texto principal blanco
-      secondary: '#B0B0B0', // Texto secundario gris claro
+      primary: '#FFFFFF',
+      secondary: '#B0B0B0',
       disabled: '#757575',
     },
-    // Opcional: Personaliza otros colores como el error, warning, info, success
+
     error: {
       main: '#F44336',
     },
@@ -65,7 +64,7 @@ const customTheme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1E1E1E', // Un poco más claro que el fondo para la barra superior
+          backgroundColor: '#1E1E1E',
           color: '#FFFFFF',
         },
       },
@@ -73,14 +72,14 @@ const customTheme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#1E1E1E', // Color del fondo del sidebar
+          backgroundColor: '#1E1E1E',
         },
       },
     },
     MuiList: {
       styleOverrides: {
         root: {
-          color: '#B0B0B0', // Color del texto de la lista del sidebar
+          color: '#B0B0B0',
         },
       },
     },
@@ -88,11 +87,11 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: 'rgba(3, 169, 244, 0.08)', // Ligero celeste al pasar el mouse
+            backgroundColor: 'rgba(3, 169, 244, 0.08)',
           },
           '&.Mui-selected': {
-            backgroundColor: 'rgba(3, 169, 244, 0.15)', // Celeste sutil para el seleccionado
-            color: '#03A9F4', // Color del texto del elemento seleccionado
+            backgroundColor: 'rgba(3, 169, 244, 0.15)',
+            color: '#03A9F4',
             '&:hover': {
               backgroundColor: 'rgba(3, 169, 244, 0.15)',
             },
@@ -103,15 +102,15 @@ const customTheme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1E1E1E', // Color de fondo para tarjetas y paneles
-          backgroundImage: 'none', // Asegura que no haya un gradiente blanco por defecto en dark mode
+          backgroundColor: '#1E1E1E',
+          backgroundImage: 'none',
         },
       },
     },
     MuiTableHead: {
       styleOverrides: {
         root: {
-          backgroundColor: '#282828', // Color de fondo para la cabecera de la tabla
+          backgroundColor: '#282828',
           '& .MuiTableCell-root': {
             color: '#FFFFFF',
           },
@@ -124,7 +123,7 @@ const customTheme = createTheme({
           '& .MuiTableRow-root': {
             backgroundColor: '#1E1E1E',
             '&:hover': {
-              backgroundColor: '#282828', // Un gris ligeramente más claro al pasar el mouse
+              backgroundColor: '#282828',
             },
           },
         },
@@ -133,41 +132,41 @@ const customTheme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          color: '#FFFFFF', // Color del texto de las celdas
-          borderBottom: '1px solid #333333', // Borde más oscuro para las celdas
+          color: '#FFFFFF',
+          borderBottom: '1px solid #333333',
         },
       },
     },
-    MuiInputBase: { // Inputs de texto, selects
+    MuiInputBase: {
       styleOverrides: {
         root: {
           color: '#FFFFFF',
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#666666', // Borde gris claro para inputs
+            borderColor: '#666666',
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#03A9F4', // Borde celeste al pasar el mouse
+            borderColor: '#03A9F4',
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#03A9F4', // Borde celeste cuando está enfocado
+            borderColor: '#03A9F4',
           },
         },
       },
     },
-    MuiInputLabel: { // Labels de inputs
+    MuiInputLabel: {
       styleOverrides: {
         root: {
           color: '#B0B0B0',
           '&.Mui-focused': {
-            color: '#03A9F4', // Celeste cuando está enfocado
+            color: '#03A9F4',
           },
         },
       },
     },
-    MuiSvgIcon: { // Íconos
+    MuiSvgIcon: {
       styleOverrides: {
         root: {
-          color: '#B0B0B0', // Color de los íconos
+          color: '#B0B0B0',
         },
       },
     },

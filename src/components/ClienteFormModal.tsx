@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import type { Cliente, CreateClienteDto, UpdateClienteDto } from '../types/Cliente';
+import type { Cliente, CreateClienteDto, UpdateClienteDto, ClienteFormModalProps } from '../types/Cliente';
 import { createCliente, updateCliente } from '../api/api';
 import { 
     Modal, Box, TextField, Button, Typography, Alert, CircularProgress, Paper
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 
-interface ClienteFormModalProps {
-    open: boolean;
-    onClose: () => void;
-    onSuccess: () => void;
-    cliente: Cliente | null; // Null para CREAR, objeto para EDITAR
-}
 
+// estilo del modal
 const modalStyle = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -27,7 +22,7 @@ const modalStyle = {
 
 const INITIAL_FORM_DATA = { nombre: '', apellido: '', telefono: '', email: '' };
 
-const ClienteFormModal: React.FC<ClienteFormModalProps> = ({ open, onClose, onSuccess, cliente }) => {
+export default function ClienteFormModal({ open, onClose, onSuccess, cliente }: ClienteFormModalProps) {
     const isEdit = !!cliente;
     
     const [formData, setFormData] = useState<CreateClienteDto>({
@@ -43,7 +38,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({ open, onClose, onSu
         setSubmitError(null);
     };
 
-    // Lógica para precargar el formulario en modo EDICIÓN
+    // logica para precargar el formulario en modo EDICIÓN
     useEffect(() => {
         if (cliente) {
             setFormData({
@@ -80,7 +75,6 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({ open, onClose, onSu
         setSubmitError(null);
 
         try {
-            // 🛑 CORRECCIÓN: Definimos y tipamos la data DENTRO de la lógica condicional 🛑
             if (isEdit && cliente) {
                 // Modo EDICIÓN (PATCH)
                 const updateData: UpdateClienteDto = {
@@ -99,10 +93,10 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({ open, onClose, onSu
                     email: formData.email,
                 };
                 await createCliente(createData);
-                resetForm();    // Limpiar el formulario tras crear un nuevo cliente
+                resetForm(); 
             }
             
-            onSuccess(); // Cierra el modal y refresca la lista
+            onSuccess();
         } catch (err: any) {
             const msg = err.response?.data?.message || err.message || "Error al guardar el cliente.";
             setSubmitError(msg);
@@ -159,5 +153,3 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({ open, onClose, onSu
         </Modal>
     );
 };
-
-export default ClienteFormModal;

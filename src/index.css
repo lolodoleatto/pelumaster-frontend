@@ -1,7 +1,4 @@
-/* src/index.css: Mantenemos solo el reseteo básico */
-
 :root {
-  /* Estas propiedades se mantienen para asegurar el comportamiento de font-rendering */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,7 +9,4 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* 🛑 MUI y CssBaseline controlarán el color de fondo y la fuente */
 }
-
-/* 🛑 TODO LO DEMÁS DEBE SER ELIMINADO 🛑 */
