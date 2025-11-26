@@ -11,12 +11,16 @@ El frontend de PeluMaster ofrece una experiencia fluida tanto para los administr
 
 El proyecto utiliza TypeScript para garantizar la seguridad de tipos y Vite para un entorno de desarrollo ultrarrápido.
 
+## 🎓 Contexto Académico
+
+Este proyecto fue desarrollado como trabajo final para la materia **Programación IV** de la carrera **Tecnicatura Universitaria en Programación (TUP)** en la **UTN** (Universidad Tecnológica Nacional).
+
 ## 🛠️ Tecnologías
 
 * **Librería:** React
 * **Build Tool:** Vite
 * **Lenguaje:** TypeScript
-* **Estilos:** CSS Modules / Styled Components (Ajustar según corresponda)
+* **Estilos:** CSS Modules / Styled Components / MUI
 
 ## 👥 Autores
 
